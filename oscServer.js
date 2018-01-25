@@ -82,8 +82,10 @@ listener.sockets.on('connection',function(socket) {
 
   //on receiving message to send
   socket.on('sendMessage',function(data) {
-    oscClient.send(data.address, data.message, function () {
-    });
+    if (oscClient) {
+      oscClient.send(data.address, data.message, function () {
+    });  
+    }
   });
 });
 
