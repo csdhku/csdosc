@@ -4,15 +4,15 @@ const url = require('url');
 const io = require('socket.io');
 const osc = require('node-osc');
 
-var sendSocket;
-var oscServer;
-var oscClient;
+var sendSocket = [];
+var oscServer = [];
+var oscClient = [];
 var clients = {};
 
 //create the server, handling the page-requests
 var server = http.createServer(function (request, response) {
   var path = url.parse(request.url).pathname;
-  console.log(path);
+  // console.log(path);
   if (path === '/') {
     path = '/index.html';
   }
@@ -45,22 +45,25 @@ var listener = io.listen(server);
 
 listener.sockets.on('connection',function(socket) {
   clients[socket.id] = socket;
+  console.log(socket.id);
   
   //initialize socket
   socket.on('oscLib',function(data) {
-    
-    sendSocket = clients[data];
+    sendSocket[data] = clients[data];
+    sendSocket[data].emit("connected",data);
   });
 
   //on receiving start message for server
   socket.on('startServer',function(data) {
-    oscServer = new osc.Server(data.port,'0.0.0.0');
+    console.log("serverData",data);
+    var id = data.id;
+    oscServer[id] = new osc.Server(data.port,'0.0.0.0');
 
-    sendSocket.emit("serverRunning",{"port":data.port});
+    sendSocket[id].emit("serverRunning",{"port":data.port});
     
-    oscServer.on("message",function(msg,rinfo) {
+    oscServer[id].on("message",function(msg,rinfo) {
       var sendData = {"add":msg[0],"msg":msg[1]};
-      sendSocket.emit('getMessage',sendData);
+      sendSocket[id].emit('getMessage',sendData);
     });
   });
 
@@ -71,8 +74,11 @@ listener.sockets.on('connection',function(socket) {
 
   //on receiving start message for client
   socket.on('startClient',function(data) {
-    oscClient = new osc.Client(data.ip, data.port);
-    sendSocket.emit("clientRunning",{"ip":data.ip,"port":data.port,"active":1});
+    var id = data.id;
+    oscClient[id] = new osc.Client(data.ip, data.port);
+    
+    console.log("clientData:",data);
+    sendSocket[id].emit("clientRunning",{"ip":data.ip,"port":data.port,"active":1});
   });
 
   //on receiving kill message for client
@@ -82,8 +88,9 @@ listener.sockets.on('connection',function(socket) {
 
   //on receiving message to send
   socket.on('sendMessage',function(data) {
-    if (oscClient) {
-      oscClient.send(data.address, data.message, function () {
+    var id = data.id;
+    if (oscClient[id]) {
+      oscClient[id].send(data.address, data.message, function () {
     });  
     }
   });

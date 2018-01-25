@@ -3,6 +3,7 @@ var socket = io.connect();
 socket.on('connect',function() {
   //connect to the server
   socket.emit('oscLib',socket.io.engine.id);
+  console.log(socket.io.engine);
 });
 
 socket.on('clientRunning',function(data) {
@@ -13,14 +14,25 @@ socket.on('serverRunning',function(data) {
   console.log("Server is listening on port " + data.port);
 });
 
+function Connect() {
+  return {
+    connectToServer: function(callback) {
+      socket.on('connected',function(data) {
+        callback(true);
+      });
+    }
+  }
+}
+
 function Client() {
   return {
     startClient: function(address,port) {
-      var sendData = {"ip":address,"port":port};
+      var sendData = {"ip":address,"port":port,"id":socket.io.engine.id};
+      console.log("client:",sendData);
       socket.emit('startClient',sendData);
     },
     sendMessage: function(address,message) {
-      var sendData = {"address":address,"message":message};
+      var sendData = {"address":address,"message":message,"id":socket.io.engine.id};
       socket.emit('sendMessage',sendData);
     },
     killClient: function() {
@@ -32,7 +44,8 @@ function Client() {
 function Server() {
   return {
     startServer: function(port) {
-      var sendData = {"port":port};
+      var sendData = {"port":port,"id":socket.io.engine.id};
+      console.log("server",sendData);
       socket.emit('startServer',sendData);
     },
     getMessage: function(callback) {
