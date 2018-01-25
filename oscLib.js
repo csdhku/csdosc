@@ -6,11 +6,11 @@ socket.on('connect',function() {
 });
 
 socket.on('clientRunning',function(data) {
-  console.log("Client is running on: "+data.ip+", port: "+data.port);
+  console.log("Client is sending to: "+data.ip+", port: "+data.port);
 });
 
 socket.on('serverRunning',function(data) {
-  console.log("Server is running on port " + data.port);
+  console.log("Server is listening on port " + data.port);
 });
 
 function Client() {
