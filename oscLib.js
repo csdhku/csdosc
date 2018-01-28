@@ -3,7 +3,6 @@ var socket = io.connect();
 socket.on('connect',function() {
   //connect to the server
   socket.emit('oscLib',socket.io.engine.id);
-  console.log(socket.io.engine);
 });
 
 socket.on('clientRunning',function(data) {
@@ -28,7 +27,6 @@ function Client() {
   return {
     startClient: function(address,port) {
       var sendData = {"ip":address,"port":port,"id":socket.io.engine.id};
-      console.log("client:",sendData);
       socket.emit('startClient',sendData);
     },
     sendMessage: function(address,message) {
@@ -45,7 +43,6 @@ function Server() {
   return {
     startServer: function(port) {
       var sendData = {"port":port,"id":socket.io.engine.id};
-      console.log("server",sendData);
       socket.emit('startServer',sendData);
     },
     getMessage: function(callback) {

@@ -12,7 +12,6 @@ var clients = {};
 //create the server, handling the page-requests
 var server = http.createServer(function (request, response) {
   var path = url.parse(request.url).pathname;
-  // console.log(path);
   if (path === '/') {
     path = '/index.html';
   }
@@ -38,15 +37,13 @@ var server = http.createServer(function (request, response) {
 //start the server listening on port 8001
 server.listen(8001,function() {
   //the server is running, listening on port 8001
-  console.log("De server is aan!");
+  console.log("De server staat aan! Je kunt deze via localhost:8001 bereiken");
 });
 
 var listener = io.listen(server);
 
 listener.sockets.on('connection',function(socket) {
-  clients[socket.id] = socket;
-  console.log(socket.id);
-  
+  clients[socket.id] = socket;  
   //initialize socket
   socket.on('oscLib',function(data) {
     sendSocket[data] = clients[data];
@@ -55,7 +52,6 @@ listener.sockets.on('connection',function(socket) {
 
   //on receiving start message for server
   socket.on('startServer',function(data) {
-    console.log("serverData",data);
     var id = data.id;
     oscServer[id] = new osc.Server(data.port,'0.0.0.0');
 
@@ -76,8 +72,6 @@ listener.sockets.on('connection',function(socket) {
   socket.on('startClient',function(data) {
     var id = data.id;
     oscClient[id] = new osc.Client(data.ip, data.port);
-    
-    console.log("clientData:",data);
     sendSocket[id].emit("clientRunning",{"ip":data.ip,"port":data.port,"active":1});
   });
 
@@ -91,7 +85,7 @@ listener.sockets.on('connection',function(socket) {
     var id = data.id;
     if (oscClient[id]) {
       oscClient[id].send(data.address, data.message, function () {
-    });  
+      });  
     }
   });
 });
