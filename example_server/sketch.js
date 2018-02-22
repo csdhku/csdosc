@@ -5,7 +5,6 @@ var x, y;
 
 function setup() {
   createCanvas(640,480);
-  background(255)
 
   connect = new Connect();
   
@@ -27,7 +26,7 @@ function setup() {
 }
 
 function draw() {
-  background(255);
+  background(50,0,220);
   ellipse(x,y,25);
 }
 

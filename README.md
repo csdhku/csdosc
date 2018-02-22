@@ -36,7 +36,8 @@ example_server meebewegen.
 
 ### osc sturen naar P5.js ###
 * Open een programma dat OSC kan versturen
-* stuur de volgende berichten naar poort 8000: 
+* stuur de volgende berichten naar poort 8000 op dezelfde computer als waar
+* node draait: 
     * /x 10 
     * /y 1
 * het balletje in de browser zal nu bewegen.
