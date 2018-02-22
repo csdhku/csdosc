@@ -2,26 +2,28 @@
 
 CSDOSC is een node.js OSC-server die je kunt gebruiken in combinatie met P5.js.  
 
-### hoe dan? ###
+### Hoe dan? ###
 * Download of clone alle bestanden naar je harde schijf en zet ze op een logische plaats. (bijvoorbeeld HKU/CSD/P5js/)
 * Download node.js via https://nodejs.org/en/download/ en installeer dit.  
+* Heb je windows? Zie het kopje hieronder. Heb je Mac, ga dan gewoon verder met de volgende stap.
 * Open de terminal en ga naar de map waar je de bestanden hebt staan. (`cd ~/HKU/CSD/P5js/csdosc`)
 * Typ: `node oscServer.js`
 * Ga in de browser naar localhost:8001/example_server  
 * Ga in een nieuw venster van je browser naar localhost:8001/example_client
 * Als het goed is kun je nu het voorbeeld bekijken.
 
-### heb je windows? Doe eerst deze stappen ###
-* Voeg node aan je path toe:
-    * zoek waar de node.exe staat. (Meestal C:\Program Files\nodejs (voor 64Bit) of C:\Program Files (x86)\nodejs (voor 32Bit))
+### Heb je windows? Doe eerst deze stappen ###
+* Voeg node aan je path toe. Dat doe je zo:
+    * zoek waar de node.exe staat. (Meestal `C:\Program Files\nodejs` (voor 64Bit) of `C:\Program Files (x86)\nodejs` (voor 32Bit))
     * Kopieer dit adres
-    * Open een Verkenner venster en doe een rechtermuisklik op This PC
-    * Kies Properties -> Advanced system settings -> Environment Variables
-    * Selecteer Path uit het vakje van "User Variables for <name>"
-    * Druk op "Edit"
-    * Druk op "New"
+    * Open een Verkenner venster en doe een rechtermuisklik op `This PC`
+    * Kies `Properties` -> `Advanced system settings` -> `Environment Variables`
+    * Selecteer Path uit het vakje van `User Variables for <name>`
+    * Druk op `Edit`
+    * Druk op `New`
     * Plak nu het adres van node in de lege regel
-    * Druk "OK"
+    * Druk `OK`
+* Ga nu verder waar je was bij het bovenste kopje
 
 
 
