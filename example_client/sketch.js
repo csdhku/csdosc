@@ -32,8 +32,10 @@ function draw() {
 }
 
 function mouseMoved() {
-  client.sendMessage("/x",mouseX);
-  client.sendMessage("/y",mouseY);
+  if (client) {
+    client.sendMessage("/x",mouseX);
+    client.sendMessage("/y",mouseY);
+  }
 }
 
 function oscReceiver(add,msg) {
