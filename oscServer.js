@@ -58,7 +58,6 @@ io.on('connection', function (socket) {
   //on receiving start message for server
   socket.on('startServer',function(data) {
     serverExist(data.port,data.id,function() {
-      console.log("nu maak ik een nieuwe:",data.id,data.port);
       oscServer[data.id] = new osc.Server(data.port,'0.0.0.0');
 
       sendSocket[data.id].emit("serverRunning",{"port":data.port});
@@ -108,12 +107,9 @@ function killOsc() {
 
 function serverExist(port,id,callback) {
   var found = 0;
-  console.log("id:",id);
   for (var i in oscServer) {
-    console.log("Existing id's:",i);
     if (oscServer[i] && oscServer[i].port == port) {
       found = 1;
-      console.log("port:",port,"id:",i);
       oscServer[i].kill();
       oscServer[i] = null;
       callback();  
