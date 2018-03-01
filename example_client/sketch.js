@@ -18,7 +18,7 @@ function setup() {
       oscReceiver(add,msg);
     });  
   });
-  
+
 
   x = 100;
   y = 100;
@@ -27,7 +27,7 @@ function setup() {
 function draw() {
   if (client) {
     background(220,0,50);
-    ellipse(mouseX,mouseY,w);
+    ellipse(mouseX,mouseY,25);
   }
 }
 
