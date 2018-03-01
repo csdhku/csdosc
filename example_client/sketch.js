@@ -10,15 +10,14 @@ function setup() {
 
   connect.connectToServer(function() {
     client = new Client();
-    client.startClient("127.0.0.1",8015);
+    client.startClient("127.0.0.1",8000);
 
     server = new Server();
-    server.startServer(8025);
+    server.startServer(8005);
     server.getMessage(function(add,msg) {
       oscReceiver(add,msg);
     });  
   });
-
 
   x = 100;
   y = 100;

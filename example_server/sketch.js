@@ -10,13 +10,13 @@ function setup() {
   
   connect.connectToServer(function() {
     server = new Server();
-    server.startServer(8015);
+    server.startServer(8000);
     server.getMessage(function(add,msg) {
       oscReceiver(add,msg);
     });
 
     client = new Client();
-    client.startClient("127.0.0.1",8025);  
+    client.startClient("127.0.0.1",8005);  
   });
 
   
