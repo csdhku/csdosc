@@ -25,8 +25,10 @@ function setup() {
 }
 
 function draw() {
-  background(220,0,50);
-  ellipse(mouseX,mouseY,25);
+  if (client) {
+    background(220,0,50);
+    ellipse(mouseX,mouseY,w);
+  }
 }
 
 function mouseMoved() {
