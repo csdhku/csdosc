@@ -47,6 +47,12 @@ io.on('connection', function (socket) {
   socket.on('oscLib',function(data) {
     sendSocket[data] = clients[data];
     sendSocket[data].emit("connected",data);
+    sendSocket[data].on('disconnect',function() {
+      if (data && oscServer[data]) {
+        oscServer[data].kill();
+        oscServer[data] = null;  
+      }
+    });
   });
 
   //on receiving start message for server
@@ -97,12 +103,6 @@ function killOsc() {
   }
   for (var i in oscClient) {
     oscClient[i].kill();
-  }
-}
-
-function showServers() {
-  for (var i in oscServer) {
-    console.log(oscServer[i].port);
   }
 }
 
