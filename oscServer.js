@@ -46,7 +46,10 @@ io.on('connection', function (socket) {
   //initialize socket
   socket.on('oscLib',function(data) {
     sendSocket[data] = clients[data];
-    sendSocket[data].emit("connected",data);
+    var returnMessage = setTimeout(function() {
+      sendSocket[data].emit("connected",data);
+    },100);
+
     sendSocket[data].on('disconnect',function() {
       if (data && oscServer[data]) {
         oscServer[data].kill();
