@@ -5,11 +5,65 @@ const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const osc = require('node-osc');
 const readline = require('readline');
+const serial = require('serialport');
 
 var sendSocket = [];
 var oscServer = [];
 var oscClient = [];
 var clients = {};
+var port = []//serial port
+
+//serial port things:
+//list available serial ports
+serial.list(function(err,ports) {
+  console.log("Serial Devices:")
+  ports.forEach(function(sPort) {
+    console.log("id:",sPort.serialNumber)
+  });
+});
+
+function connectSerial(sn,id,baud) {
+  serial.list(function(err,ports) {
+    ports.forEach(function(sPort) {
+      if (sPort.serialNumber == sn) {
+        connectSerDev(sPort,id,baud);
+      }
+    })
+  })
+}
+
+function connectSerDev(sPort,id,baud) {
+  port[id] = new serial(sPort.comName, {
+    baudRate: baud
+  }, function() {
+    console.log("Device connected");
+    readPort(id);
+  });
+}
+
+function readPort(id) {
+  if (port[id]) {
+    port[id].on('data',function(data) {
+      console.log(data,data.length);
+      if (data[0] == 255 && data[3] == 48) {
+        var sendData = {"lsb":data[1],"hsb":data[2]};
+        sendSocket[id].emit('getSerial',sendData);
+      }
+    });
+  }
+} 
+
+function sendSerial(lsb,hsb,id) {
+  if (port[id]) {
+    var sermes = [lsb,hsb];
+    port[id].write(sermes,function(error) {
+      if (error) {
+        console.log(error);
+      }
+    });
+  }
+}
+
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -17,7 +71,7 @@ const rl = readline.createInterface({
 });
 
 rl.on('line', (input) => {
-  if (input === "quit" || input === "stop" || input == "hou op!") {
+  if (input == "quit" || input == "stop" || input == "hou op!") {
     killOsc();
     process.exit(0);
   }
@@ -94,6 +148,16 @@ io.on('connection', function (socket) {
       oscClient[data.id].send(data.address, data.message, function () {
       });  
     }
+  });
+
+
+  //serial from library:
+  socket.on('connectSerial',function(data) {
+    connectSerial(data.serialId,data.id,data.baud);
+  });
+
+  socket.on('sendSerial',function(data) {
+    sendSerial(data.lsb,data.hsb,data.id);
   });
 });
 

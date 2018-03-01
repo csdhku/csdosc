@@ -55,3 +55,21 @@ function Server() {
     }
   }
 }
+
+function Serial() {
+  return {
+    connectSerial: function(id,baud) {
+      var sendData = {"serialId":id,"id":socket.io.engine.id,"baud":baud};
+      socket.emit('connectSerial',sendData);
+    },
+    receiveSerial: function(callback) {
+      socket.on('getSerial',function(data) {
+        callback(data.lsb,data.hsb);
+      })
+    },
+    sendSerial: function(lsb,hsb) {
+      var sendData = {"lsb":lsb,"hsb":hsb,"id":socket.io.engine.id};
+      socket.emit('sendSerial',sendData);
+    }
+  }
+}
