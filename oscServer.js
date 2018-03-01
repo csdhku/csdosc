@@ -4,11 +4,23 @@ const path = require('path');
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const osc = require('node-osc');
+const readline = require('readline');
 
 var sendSocket = [];
 var oscServer = [];
 var oscClient = [];
 var clients = {};
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+rl.on('line', (input) => {
+  if (input === "quit" || input === "stop" || input == "hou op!") {
+    process.exit(0);
+  }
+})
 
 //start the server listening on port 8001
 server.listen(8001,function() {
