@@ -25,17 +25,13 @@ function setup() {
 }
 
 function draw() {
-  if (client) {
-    background(220,0,50);
-    ellipse(mouseX,mouseY,25);
-  }
+  background(220,0,50);
+  ellipse(mouseX,mouseY,25);
 }
 
 function mouseMoved() {
-  if (client) {
-    client.sendMessage("/x",mouseX);
-    client.sendMessage("/y",mouseY);
-  }
+  client.sendMessage("/x",mouseX);
+  client.sendMessage("/y",mouseY);
 }
 
 function oscReceiver(add,msg) {
