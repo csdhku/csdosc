@@ -18,9 +18,15 @@ const rl = readline.createInterface({
 
 rl.on('line', (input) => {
   if (input === "quit" || input === "stop" || input == "hou op!") {
+    killOsc();
     process.exit(0);
   }
-})
+});
+
+process.on('SIGINT', () => {
+  killOsc();
+  process.exit(0);
+});
 
 //start the server listening on port 8001
 server.listen(8001,function() {
@@ -35,8 +41,6 @@ app.use(function(req,res,next) {
   res.status(400).send("doet het niet");
 });
 
-
-
 io.on('connection', function (socket) {
   clients[socket.id] = socket;  
   //initialize socket
@@ -47,13 +51,16 @@ io.on('connection', function (socket) {
 
   //on receiving start message for server
   socket.on('startServer',function(data) {
-    oscServer[data.id] = new osc.Server(data.port,'0.0.0.0');
+    serverExist(data.port,data.id,function() {
+      console.log("nu maak ik een nieuwe:",data.id,data.port);
+      oscServer[data.id] = new osc.Server(data.port,'0.0.0.0');
 
-    sendSocket[data.id].emit("serverRunning",{"port":data.port});
-    
-    oscServer[data.id].on("message",function(msg,rinfo) {
-      var sendData = {"add":msg[0],"msg":msg[1]};
-      sendSocket[data.id].emit('getMessage',sendData);
+      sendSocket[data.id].emit("serverRunning",{"port":data.port});
+        
+      oscServer[data.id].on("message",function(msg,rinfo) {
+        var sendData = {"add":msg[0],"msg":msg[1]};
+        sendSocket[data.id].emit('getMessage',sendData);
+      });
     });
   });
 
@@ -82,8 +89,40 @@ io.on('connection', function (socket) {
   });
 });
 
+function killOsc() {
+  for (var i in oscServer) {
+    if (oscServer[i]) {
+      oscServer[i].kill();  
+    }
+  }
+  for (var i in oscClient) {
+    oscClient[i].kill();
+  }
+}
 
+function showServers() {
+  for (var i in oscServer) {
+    console.log(oscServer[i].port);
+  }
+}
 
+function serverExist(port,id,callback) {
+  var found = 0;
+  console.log("id:",id);
+  for (var i in oscServer) {
+    console.log("Existing id's:",i);
+    if (oscServer[i] && oscServer[i].port == port) {
+      found = 1;
+      console.log("port:",port,"id:",i);
+      oscServer[i].kill();
+      oscServer[i] = null;
+      callback();  
+    }
+  }
+  if (!found) {
+    callback();  
+  }
+}
 
 
 
