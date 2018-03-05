@@ -6,15 +6,20 @@ const io = require('socket.io')(server);
 const osc = require('node-osc');
 const readline = require('readline');
 const serial = require('serialport');
+const _ = require('lodash');
 
 var sendSocket = [];
 var oscServer = [];
 var oscClient = [];
 var clients = {};
 var port = []//serial port
+var matches = [];
 
-//serial port things:
-//list available serial ports
+/*----serial-communication----------/
+ *---------functions----------------/
+ *///-------------------------------/
+
+//show a list of available serial devices
 serial.list(function(err,ports) {
   console.log("Serial Devices:")
   ports.forEach(function(sPort) {
@@ -22,16 +27,19 @@ serial.list(function(err,ports) {
   });
 });
 
+//check if the given device is online, if so send it's information to connect function
+//sn = serial number, id = page socket id, baud = baud rate
 function connectSerial(sn,id,baud) {
   serial.list(function(err,ports) {
     ports.forEach(function(sPort) {
       if (sPort.serialNumber == sn) {
         connectSerDev(sPort,id,baud);
       }
-    })
-  })
+    });
+  });
 }
 
+//connect to the serial device
 function connectSerDev(sPort,id,baud) {
   port[id] = new serial(sPort.comName, {
     baudRate: baud
@@ -41,22 +49,54 @@ function connectSerDev(sPort,id,baud) {
   });
 }
 
+//read data from the serial port. 
 function readPort(id) {
   if (port[id]) {
     port[id].on('data',function(data) {
-      console.log(data,data.length);
-      if (data[0] == 255 && data[3] == 48) {
-        var sendData = {"lsb":data[1],"hsb":data[2]};
-        sendSocket[id].emit('getSerial',sendData);
-      }
+      handleSerial(data);
     });
   }
 } 
 
-function sendSerial(lsb,hsb,id) {
+//send the serial data to match-objects to check if the pattern is matching
+function handleSerial(data) {
+  for (var i=0;i<data.length;i++) {
+    for (var j in matches) {
+      matches[j].findNewMatch(data[i]);
+    }
+  }
+}
+
+//match 'class': send a pattern and check if the pattern matches.
+//if it does, send it back to the oscLib.js
+function Match(pattern,index,id) {
+  var match = pattern;
+  var result = [];
+  var sendId = index;
+  var pageId = id;
+  return {
+    findNewMatch: function(value) {
+      if (result.length < match.length) {
+        result.push(value);
+      }
+      else {
+        result.push(value);
+        result.shift();
+      }
+      if (result[0] == match[0] && result[match.length-1] == match[match.length-1]) {
+        result.pop();
+        result.shift();
+        var sendData = {"result":result,"index":sendId};
+        sendSocket[pageId].emit('getSerial',sendData);
+      }
+    }
+  }
+}
+
+//send serial data to the device.
+function sendSerial(data,id) {
   if (port[id]) {
-    var sermes = [lsb,hsb];
-    port[id].write(sermes,function(error) {
+    port[id].write(data,function(error) {
       if (error) {
         console.log(error);
       }
@@ -64,12 +104,42 @@ function sendSerial(lsb,hsb,id) {
   }
 }
 
+/*--------------osc-----------------/
+ *-----------functions--------------/
+ *///-------------------------------/
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
+//check if a server is already running on the desired port, if so: kill it first
+function serverExist(port,id,callback) {
+  var found = 0;
+  for (var i in oscServer) {
+    if (oscServer[i] && oscServer[i].port == port) {
+      found = 1;
+      oscServer[i].kill();
+      oscServer[i] = null;
+      callback();  
+    }
+  }
+  if (!found) {
+    callback();  
+  }
+}
+
+/*--------user-interaction----------/
+ *----------exit-program------------/
+ *///-------------------------------/
+
+//handle ctrl+c 
+process.on('SIGINT', function(){
+  killOsc();
+  process.exit (0);
 });
 
+//get user input from the terminal
+const rl = readline.createInterface({
+  input: process.stdin
+});
+
+//if input is any of these words, quit the program
 rl.on('line', (input) => {
   if (input == "quit" || input == "stop" || input == "hou op!") {
     killOsc();
@@ -77,10 +147,29 @@ rl.on('line', (input) => {
   }
 });
 
-process.on('SIGINT', () => {
-  killOsc();
-  process.exit(0);
-});
+// close all ports etc.
+function killOsc() {
+  for (var i in oscServer) {
+    if (oscServer[i]) {
+      oscServer[i].kill();  
+    }
+  }
+  for (var i in oscClient) {
+    if (oscClient[i]) {
+      oscClient[i].kill();  
+    }
+  }
+  for (var i in sendSocket) {
+    sendSocket[i].disconnect();
+  }
+  for (var i in port) {
+    port[i].close();
+  }
+}
+
+/*-----------http-server------------/
+ *----------------------------------/
+ *///-------------------------------/
 
 //start the server listening on port 8001
 server.listen(8001,function() {
@@ -95,19 +184,29 @@ app.use(function(req,res,next) {
   res.status(400).send("doet het niet");
 });
 
+/*----------web-socket--------------/
+ *----------------------------------/
+ *///-------------------------------/
+
 io.on('connection', function (socket) {
   clients[socket.id] = socket;  
-  //initialize socket
+  
+  //initialize socket, make a connection with the webpage
   socket.on('oscLib',function(data) {
     sendSocket[data] = clients[data];
     var returnMessage = setTimeout(function() {
       sendSocket[data].emit("connected",data);
     },100);
 
+    //what to do on disconnecting
     sendSocket[data].on('disconnect',function() {
       if (data && oscServer[data]) {
         oscServer[data].kill();
-        oscServer[data] = null;  
+        oscServer[data] = null;
+      }
+      if (data && port[data]) {
+        console.log("Device disconnected");
+        port[data].close();  
       }
     });
   });
@@ -150,42 +249,19 @@ io.on('connection', function (socket) {
     }
   });
 
-
-  //serial from library:
+  //on connecting to a serial device:
   socket.on('connectSerial',function(data) {
     connectSerial(data.serialId,data.id,data.baud);
   });
 
+  //send serial message
   socket.on('sendSerial',function(data) {
-    sendSerial(data.lsb,data.hsb,data.id);
+    sendSerial(data.data,data.id);
+  });
+
+  //receive serial message
+  socket.on('receiveSerial',function(data,fn) {
+    fn(matches.length);
+    matches.push(new Match(data.pattern,matches.length,data.id));
   });
 });
-
-function killOsc() {
-  for (var i in oscServer) {
-    if (oscServer[i]) {
-      oscServer[i].kill();  
-    }
-  }
-  for (var i in oscClient) {
-    oscClient[i].kill();
-  }
-}
-
-function serverExist(port,id,callback) {
-  var found = 0;
-  for (var i in oscServer) {
-    if (oscServer[i] && oscServer[i].port == port) {
-      found = 1;
-      oscServer[i].kill();
-      oscServer[i] = null;
-      callback();  
-    }
-  }
-  if (!found) {
-    callback();  
-  }
-}
-
-
-
