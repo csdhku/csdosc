@@ -55,3 +55,29 @@ function Server() {
     }
   }
 }
+
+function Serial() {
+  return {
+    //make a connection with a serial device, supply device-id and baud rate.
+    connectSerial: function(id,baud) {
+      var sendData = {"serialId":id,"id":socket.io.engine.id,"baud":baud};
+      socket.emit('connectSerial',sendData);
+    },
+    //ask to receive serial data, supply a pattern and a callback function for the result
+    receiveSerial: function(pattern,callback) {
+      var sendData = {"pattern":pattern,"id":socket.io.engine.id};
+      socket.emit('receiveSerial',sendData,function(r) {
+        socket.on('getSerial',function(data) {
+          if (data.index == r) {
+            callback(data.result);  
+          }
+        });  
+      });
+    },
+    //send serial data, supply an array with data.
+    sendSerial: function(data) {
+      var sendData = {"data":data,"id":socket.io.engine.id};
+      socket.emit('sendSerial',sendData);
+    }
+  }
+}
