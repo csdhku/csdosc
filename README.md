@@ -157,8 +157,8 @@ Het tweede getal is de baudrate, de snelheid waarmee jouw computer met de Teensy
 
 #### Berichten verzenden ####
 Je kunt met deze serial-library zowel berichten ontvangen van je Teensy als berichten verzenden naar je Teensy. Het verzenden van berichten werkt als volgt:  
-Een seriële poort verstuurt, zoals de naam doet vermoeden, berichten één voor één. Als je dus bijvoorbeeld de getallen 15, 90 en 12 wil verzenden zal eerst de 15 worden verzonden, daarna de 90 en daarna de 12. Als je vervolgens een nieuw bericht wil sturen, bijvoobeeld: 18, 11, 64 en 77 dan moet er op de één of andere manier duidelijk worden waar het eerste bericht begint en eindigt en waar het tweede bericht begint en eindigt.  
-Om dit duidelijk te maken zetten we aan het begin en aan het eind van de reeks getallen die we willen versturen een getal dat dient als identifier. Dus ons eerste bericht ziet er dan zo uit: ```[255,15,90,12,1]```. Voor het tweede bericht gebruiken twee andere getallen die als identifier dienen: ```[254,18,11,64,77,2]```. Aangezien je maximaal één byte per keer kan versturen en grootste getal dat in byte past 255 is, zullen de getallen die je kunt verzenden niet groter zijn dan 255. Ook de identifiers die aan het begin en eind van een bericht staan kunnen niet groter zijn dan 255.  
+Een seriële poort verstuurt, zoals de naam doet vermoeden, berichten één voor één. Als je dus bijvoorbeeld de getallen _15, 90 en 12_ wil verzenden zal eerst de 15 worden verzonden, daarna de 90 en daarna de 12. Als je vervolgens een nieuw bericht wil sturen, bijvoobeeld: _18, 11, 64 en 77_, moet er op de één of andere manier duidelijk worden waar het eerste bericht eindigt en waar het tweede bericht begint.  
+Om dit duidelijk te maken zetten we aan het begin en aan het eind van de reeks getallen die we willen versturen een getal dat dient als identifier. Dus ons eerste bericht ziet er dan zo uit: ```[255,15,90,12,1]```. Voor het tweede bericht gebruiken we twee andere getallen die als identifier dienen: ```[254,18,11,64,77,2]```. Aangezien je maximaal één byte per keer kan versturen en grootste getal dat in byte past 255 is, zullen de getallen die je kunt verzenden niet groter zijn dan 255. Ook de identifiers die aan het begin en eind van een bericht staan kunnen niet groter zijn dan 255.  
 Voor elke functie op de Teensy (het aan- of uitzetten van een motor, led of iets dergelijks) gebruik je een nieuwe unieke identifier.  
 Eén van de twee identifier-getallen moet anders zijn dan bij de andere berichten. Dus je kunt prima voor elk bericht hetzelfde begingetal gebruiken, zolang je dan maar een ander eindgetal gebruikt.  
 Met de volgende code kun je een bericht versturen naar de Teensy:
@@ -169,4 +169,31 @@ Houdt er rekening mee dat als je berichten verstuurt in de draw-loop, deze beric
 
 #### Berichten ontvangen ####
 
+Om berichten te ontvangen moet je opnieuw gebruik maken van unieke identifier-nummers om duidelijk te krijgen welke functie je bericht heeft, of het bijvoorbeeld data van een potmeter is, van een LDR of van een bewegingssensor.  
+De code voor het ontvangen van berichten plaats je in de setup(), in de connect-functie en ziet er alsvolgt uit:
 
+~~~
+serial.receiveSerial([255,null,null,49],function(result) {
+  receiveData(result);
+});
+~~~
+
+Op de plaats van de null komt een variabel getal dat door de Teensy wordt verzonden
+Buiten de setup en draw functie kun je vervolgens een functie maken waarin je de data verwerkt. De identifier-nummers worden door de library weggefilterd, dus in _result_ komt een array te staan met de lengte van het aantaal nulls dat je hebt opgegeven.
+
+~~~
+function receiveData(result) {
+  x = (result[0]*256)+result[1];
+}
+~~~
+
+####getallen groter dan 255 versturen####
+
+Omdat er maximaal een byte per keer kan worden verzonden en ontvangen moet er een manier worden verzonnen om getallen groter dan 255 te versturen. Om dit te doen kun je in de Arduino-code een getal dat groter is dan 255 op de volgende manier onderverdelen in twee getallen:
+~~~
+byte sendBytes = [255,0,0,49];
+int sendBytes[1] = x / 256;
+int sendBytes[2] = x % 256;
+Serial.write(sendBytes,4);
+~~~
+In de javascript-code vermenigvuldig je vervolgens het eerste getal met 256 en tel je daar het tweede getal bij op.  
