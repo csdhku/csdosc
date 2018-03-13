@@ -3,7 +3,7 @@
 CSDOSC is een node.js server voor Open Sound Control en seriële
 communcicatie die je kunt gebruiken in combinatie met P5.js.  
 
-## Open Sound Control##
+## Open Sound Control ##
 
 ### Hoe instaleren en configureren ###
 * Download of clone alle bestanden naar je harde schijf en zet ze op een logische plaats. (bijvoorbeeld HKU/CSD/P5js/)
@@ -88,7 +88,7 @@ Je kunt vervolgens met de volgende code berichten sturen naar een server:
 client.sendMessage("/x",15); //"/x" is het adres, 15 is het bericht.  
 ~~~
 
-## Seriële communicatie (voor Arduino en Teensy)##
+## Seriële communicatie (voor Arduino en Teensy) ##
 
 ### Installeren en configureren ###
 
@@ -126,4 +126,47 @@ id: 2216420
 * Elke Arduino of Teensy heeft een eigen, uniek serienummer. Dit nummer is in het terminalvenster te zien. Als je meerdere serienummers ziet moet je de Teensy even ontkoppelen, de server even afsluiten (ctrl+c) en opnieuw starten (pijltje omhoog + enter). Er zal nu een serienummer verdwenen zijn. Daarna verbind je de Teensy weer en sluit je de server en start je deze opnieuw op. Het nummer dat nu weer verschijnt is het serienummer van de Teensy.
 * Hoe je hier vervolgens data van ontvangt of naar verstuurt staat hieronder beschreven. 
 
-### Code Gebruiken ###
+### Code gebruiken ###
+
+#### Initialisatie ####
+Om gebruik te maken van de library moet je, net als bij _Open Sound Control_, eerst verbinding maken met deze library. Hiervoor is de volgende code nodig:
+~~~
+var serial
+var connect
+
+function setup() {
+  createCanvast(800,600);
+  connect = new Connect();
+  connect.connectToServer(function() {
+
+  });
+}
+
+function draw() {
+
+}
+~~~
+Met connectToServer wordt er een verbindig gemaakt met de library en zodra deze verbindig gemaakt is wordt alles wat tussende daaropvolgende _function() {}_ staat uitgevoerd.  
+De verbinding met de seriele poort wordt gemaakt door de volgende code uit te voeren:
+~~~ 
+serial = new Serial;
+serial.connectSerial("2216420",115200);
+~~~
+Het eerste getal dat je als argument meegeeft aan de connectSerial-functie is het serienummer van de Teensy. Je ziet hierboven hoe je dat nummer kunt vinden.  
+Het tweede getal is de baudrate, de snelheid waarmee jouw computer met de Teensy communiceert.  
+
+#### Berichten verzenden ####
+Je kunt met deze serial-library zowel berichten ontvangen van je Teensy als berichten verzenden naar je Teensy. Het verzenden van berichten werkt als volgt:  
+Een seriële poort verstuurt, zoals de naam doet vermoeden, berichten één voor één. Als je dus bijvoorbeeld de getallen 15, 90 en 12 wil verzenden zal eerst de 15 worden verzonden, daarna de 90 en daarna de 12. Als je vervolgens een nieuw bericht wil sturen, bijvoobeeld: 18, 11, 64 en 77 dan moet er op de één of andere manier duidelijk worden waar het eerste bericht begint en eindigt en waar het tweede bericht begint en eindigt.  
+Om dit duidelijk te maken zetten we aan het begin en aan het eind van de reeks getallen die we willen versturen een getal dat dient als identifier. Dus ons eerste bericht ziet er dan zo uit: ```[255,15,90,12,1]```. Voor het tweede bericht gebruiken twee andere getallen die als identifier dienen: ```[254,18,11,64,77,2]```. Aangezien je maximaal één byte per keer kan versturen en grootste getal dat in byte past 255 is, zullen de getallen die je kunt verzenden niet groter zijn dan 255. Ook de identifiers die aan het begin en eind van een bericht staan kunnen niet groter zijn dan 255.  
+Voor elke functie op de Teensy (het aan- of uitzetten van een motor, led of iets dergelijks) gebruik je een nieuwe unieke identifier.  
+Eén van de twee identifier-getallen moet anders zijn dan bij de andere berichten. Dus je kunt prima voor elk bericht hetzelfde begingetal gebruiken, zolang je dan maar een ander eindgetal gebruikt.  
+Met de volgende code kun je een bericht versturen naar de Teensy:
+~~~
+serial.sendSerial([254,18,11,64,77]);
+~~~
+Houdt er rekening mee dat als je berichten verstuurt in de draw-loop, deze berichten met de snelheid van de framerate worden verstuurd. Dit kan de Teensy niet altijd even goed aan. Zorg er dus voor dat er alleen berichten worden verstuurd als er iets verandert in de code.
+
+#### Berichten ontvangen ####
+
+
