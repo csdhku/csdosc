@@ -1,11 +1,11 @@
 # csdosc #
 
 CSDOSC is een node.js server voor Open Sound Control en seriële
-communcicatie die je kunt gebruiken in combinatie met P5.js.  
+communicatie die je kunt gebruiken in combinatie met P5.js.  
 
 ## Open Sound Control ##
 
-### Hoe instaleren en configureren ###
+### Hoe installeren en configureren ###
 * Download of clone alle bestanden naar je harde schijf en zet ze op een logische plaats. (bijvoorbeeld HKU/CSD/P5js/)
 * Download node.js via https://nodejs.org/en/download/ en installeer dit.  
 * Heb je windows? Zie het kopje hieronder. Heb je Mac, ga dan gewoon verder met de volgende stap.
@@ -17,7 +17,7 @@ communcicatie die je kunt gebruiken in combinatie met P5.js.
 
 ### Heb je windows? Doe eerst deze stappen ###
 * Voeg node aan je path toe. Dat doe je zo:
-    * zoek waar de node.exe staat. (Meestal `C:\Program Files\nodejs` (voor 64Bit) of `C:\Program Files (x86)\nodejs` (voor 32Bit))
+    * zoek waar node.exe staat. (Meestal `C:\Program Files\nodejs` (voor 64Bit) of `C:\Program Files (x86)\nodejs` (voor 32Bit))
     * Kopieer dit adres
     * Open een Verkenner venster en doe een rechtermuisklik op `This PC`
     * Kies `Properties` -> `Advanced system settings` -> `Environment Variables`
@@ -120,7 +120,7 @@ id: 2216420
 * Pak het zip-bestand uit en vervang de bestanden uit de csdosc-map die al op je computer staat met de nieuwe. 
 * Open de terminal als administrator (typ in het zoekvenster rechtsonder cmd en klik daar met je rechtermuisknop op. Kies vervolgens _open as administrator_).
 * Ga naar de csdosc-map (```cd ~/Path/to/csdosc```)
-* Installeer de _Window Build Tools_ met het volgende commando: ```npm install -g windows-build-tools```. Dit kan ±10 minuten duren. 
+* Installeer de _Window Build Tools_ met het volgende commando: ```npm install -g windows-build-tools```. Dit kan ±10 minuten duren. Je moet hiervoor online zijn omdat er modules van externe sites geinstalleerd worden.
 * Typ nu: ```npm rebuild```, hiermee installeer je de benodigde bibliotheek voor seriële communicatie
 * Plug de usb-kabel van de Teensy in.
 * Typ vervolgens ```node oscServer.js``` en de server zal starten. 
@@ -172,14 +172,14 @@ Het tweede getal is de baudrate, de snelheid waarmee jouw computer met de Teensy
 #### Berichten verzenden ####
 Je kunt met deze serial-library zowel berichten ontvangen van je Teensy als berichten verzenden naar je Teensy. Het verzenden van berichten werkt als volgt:  
 Een seriële poort verstuurt, zoals de naam doet vermoeden, berichten één voor één. Als je dus bijvoorbeeld de getallen _15, 90 en 12_ wil verzenden zal eerst de 15 worden verzonden, daarna de 90 en daarna de 12. Als je vervolgens een nieuw bericht wil sturen, bijvoobeeld: _18, 11, 64 en 77_, moet er op de één of andere manier duidelijk worden waar het eerste bericht eindigt en waar het tweede bericht begint.  
-Om dit duidelijk te maken zetten we aan het begin en aan het eind van de reeks getallen die we willen versturen een getal dat dient als identifier. Dus ons eerste bericht ziet er dan zo uit: ```[255,15,90,12,1]```. Voor het tweede bericht gebruiken we twee andere getallen die als identifier dienen: ```[254,18,11,64,77,2]```. Aangezien je maximaal één byte per keer kan versturen en grootste getal dat in byte past 255 is, zullen de getallen die je kunt verzenden niet groter zijn dan 255. Ook de identifiers die aan het begin en eind van een bericht staan kunnen niet groter zijn dan 255.  
+Om dit duidelijk te maken zetten we aan het begin en aan het eind van de reeks getallen die we willen versturen een getal dat dient als identifier. Dus ons eerste bericht ziet er dan zo uit: ```[255,15,90,12,1]```. Voor het tweede bericht gebruiken we twee andere getallen die als identifier dienen: ```[254,18,11,64,77,2]```. Aangezien je maximaal één byte per keer kan versturen en grootste getal dat in één byte past 255 is, zullen de getallen die je kunt verzenden niet groter zijn dan 255. Ook de identifiers die aan het begin en eind van een bericht staan kunnen niet groter zijn dan 255.  
 Voor elke functie op de Teensy (het aan- of uitzetten van een motor, led of iets dergelijks) gebruik je een nieuwe unieke identifier.  
 Eén van de twee identifier-getallen moet anders zijn dan bij de andere berichten. Dus je kunt prima voor elk bericht hetzelfde begingetal gebruiken, zolang je dan maar een ander eindgetal gebruikt.  
 Met de volgende code kun je een bericht versturen naar de Teensy:
 ~~~
 serial.sendSerial([254,18,11,64,77]);
 ~~~
-Houdt er rekening mee dat als je berichten verstuurt in de draw-loop, deze berichten met de snelheid van de framerate worden verstuurd. Dit kan de Teensy niet altijd even goed aan. Zorg er dus voor dat er alleen berichten worden verstuurd als er iets verandert in de code.
+Houd er rekening mee dat als je berichten verstuurt in de draw-loop, deze berichten met de snelheid van de framerate worden verstuurd. Dit kan de Teensy niet altijd even goed aan. Zorg er dus voor dat er alleen berichten worden verstuurd als er iets verandert, bijvoorbeeld dat de mouse pointer beweegt, een balletje ergens tegenaan stuitert of er iets in het beeld van de webcam gedetecteerd wordt.
 
 #### Berichten ontvangen ####
 
@@ -193,7 +193,7 @@ serial.receiveSerial([255,null,null,49],function(result) {
 ~~~
 
 Op de plaats van de null komt een variabel getal dat door de Teensy wordt verzonden
-Buiten de setup en draw functie kun je vervolgens een functie maken waarin je de data verwerkt. De identifier-nummers worden door de library weggefilterd, dus in _result_ komt een array te staan met de lengte van het aantaal nulls dat je hebt opgegeven.
+Buiten de setup en draw functie kun je vervolgens een functie maken waarin je de data verwerkt. De identifier-nummers worden door de library weggefilterd, dus in _result_ komt een array te staan met de lengte van het aantal nulls dat je hebt opgegeven.
 
 ~~~
 function receiveData(result) {
@@ -235,7 +235,7 @@ function mousePressed() {
 
 
 
-#### getallen groter dan 255 versturen ####
+#### Getallen groter dan 255 versturen ####
 
 Omdat er maximaal een byte per keer kan worden verzonden en ontvangen moet er een manier worden verzonnen om getallen groter dan 255 te versturen. Om dit te doen kun je in de Arduino-code een getal dat groter is dan 255 op de volgende manier onderverdelen in twee getallen:
 ~~~
