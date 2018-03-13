@@ -1,8 +1,11 @@
 # csdosc #
 
-CSDOSC is een node.js OSC-server die je kunt gebruiken in combinatie met P5.js.  
+CSDOSC is een node.js server voor Open Sound Control en seriële
+communcicatie die je kunt gebruiken in combinatie met P5.js.  
 
-### Hoe dan? ###
+## Open Sound Control##
+
+### Hoe instaleren en configureren ###
 * Download of clone alle bestanden naar je harde schijf en zet ze op een logische plaats. (bijvoorbeeld HKU/CSD/P5js/)
 * Download node.js via https://nodejs.org/en/download/ en installeer dit.  
 * Heb je windows? Zie het kopje hieronder. Heb je Mac, ga dan gewoon verder met de volgende stap.
@@ -24,7 +27,6 @@ CSDOSC is een node.js OSC-server die je kunt gebruiken in combinatie met P5.js.
     * Plak nu het adres van node in de lege regel
     * Druk `OK`
 * Ga nu verder waar je was bij het bovenste kopje
-
 
 
 ### voorbeeld ###
@@ -85,3 +87,43 @@ Je kunt vervolgens met de volgende code berichten sturen naar een server:
 ~~~
 client.sendMessage("/x",15); //"/x" is het adres, 15 is het bericht.  
 ~~~
+
+## Seriële communicatie (voor Arduino en Teensy)##
+
+### Installeren en configureren ###
+
+#### MacOS ####
+* Download de nieuwste versie van de csdosc: klik hierboven op 'clone or download' en dan op download zip.
+* Pak het zip-bestand uit en vervang de bestanden uit de csdosc-map die al op je computer staat met de nieuwe. 
+* Open de terminal en ga naar de csdosc-map (```cd ~/Path/to/csdosc```)
+* Typ: ```npm rebuild```, hiermee installeer je de benodigde bibliotheek voor seriële communicatie
+* Plug de usb-kabel van de Teensy in.
+* Typ vervolgens ```node oscServer.js``` en de server zal starten. 
+* In de terminal zie je vervolgens een lijst met serienummers van verbonden apparaten. Dit ziet er bijvoorbeeld als volgt uit:  
+~~~
+Serial Devices:
+id: undefined
+id: 2216420
+~~~
+* Elke Arduino of Teensy heeft een eigen, uniek serienummer. Dit nummer is in het terminalvenster te zien. Als je meerdere serienummers ziet moet je de Teensy even ontkoppelen, de server even afsluiten (ctrl+c) en opnieuw starten (pijltje omhoog + enter). Er zal nu een serienummer verdwenen zijn. Daarna verbind je de Teensy weer en sluit je de server en start je deze opnieuw op. Het nummer dat nu weer verschijnt is het serienummer van de Teensy.
+* Hoe je hier vervolgens data van ontvangt of naar verstuurt staat hieronder beschreven. 
+
+#### Windows ####
+* Download de nieuwste versie van de csdosc: klik hierboven op 'clone or download' en dan op download zip.
+* Pak het zip-bestand uit en vervang de bestanden uit de csdosc-map die al op je computer staat met de nieuwe. 
+* Open de terminal als administrator (typ in het zoekvenster rechtsonder cmd en klik daar met je rechtermuisknop op. Kies vervolgens _open as administrator_).
+* Ga naar de csdosc-map (```cd ~/Path/to/csdosc```)
+* Installeer de _Window Build Tools_ met het volgende commando: ```npm install -g windows-build-tools```. Dit kan ±10 minuten duren. 
+* Typ nu: ```npm rebuild```, hiermee installeer je de benodigde bibliotheek voor seriële communicatie
+* Plug de usb-kabel van de Teensy in.
+* Typ vervolgens ```node oscServer.js``` en de server zal starten. 
+* In de terminal zie je vervolgens een lijst met serienummers van verbonden apparaten. Dit ziet er bijvoorbeeld als volgt uit:  
+~~~
+Serial Devices:
+id: undefined
+id: 2216420
+~~~
+* Elke Arduino of Teensy heeft een eigen, uniek serienummer. Dit nummer is in het terminalvenster te zien. Als je meerdere serienummers ziet moet je de Teensy even ontkoppelen, de server even afsluiten (ctrl+c) en opnieuw starten (pijltje omhoog + enter). Er zal nu een serienummer verdwenen zijn. Daarna verbind je de Teensy weer en sluit je de server en start je deze opnieuw op. Het nummer dat nu weer verschijnt is het serienummer van de Teensy.
+* Hoe je hier vervolgens data van ontvangt of naar verstuurt staat hieronder beschreven. 
+
+### Code Gebruiken ###
