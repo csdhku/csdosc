@@ -41,7 +41,14 @@ example_server meebewegen.
 * het balletje in de browser zal nu bewegen.
 
 ### code gebruiken ###
-Met deze OSC-library kun je zowel een server als een client aanmaken
+Met deze OSC-library kun je zowel een server als een client aanmaken.
+
+In het index.html-bestand moet je de volgende extra regels invoeren bovenop de gebruikelijke P5-libraries:
+
+~~~
+<script src="../Library/socket_io.js"></script>
+<script src="../oscLib.js"></script>
+~~~
 
 #### Server ####
 De server kan berichten ontvangen. Voor het aanmaken van een server hoef je alleen maar het poortnummer op te geven waarop je data wil ontvangen
@@ -128,6 +135,13 @@ id: 2216420
 
 ### Code gebruiken ###
 
+In het index.html-bestand moet je de volgende extra regels invoeren bovenop de gebruikelijke P5-libraries:
+
+~~~
+<script src="../Library/socket_io.js"></script>
+<script src="../oscLib.js"></script>
+~~~
+
 #### Initialisatie ####
 Om gebruik te maken van de library moet je, net als bij _Open Sound Control_, eerst verbinding maken met deze library. Hiervoor is de volgende code nodig:
 ~~~
@@ -187,7 +201,41 @@ function receiveData(result) {
 }
 ~~~
 
-####getallen groter dan 255 versturen####
+### Complete code ###
+Een voorbeeld van een volledig werkende code voor het versturen en ontvangen van data van een Teensy of Arduino staat hieronder:
+~~~
+var serial
+var connect
+var x = 0;
+function setup() {
+  createCanvast(800,600);
+  connect = new Connect();
+  connect.connectToServer(function() {
+    serial = new Serial;
+    serial.connectSerial("2216420",115200);
+    serial.receiveSerial([255,null,null,49],function(result) {
+      receiveData(result);
+    });
+  });
+}
+
+function draw() {
+  background(255);
+  ellipse(x,10,25);
+}
+
+function receiveData(result) {
+  x = (result[0]*256)+result[1];
+}
+
+function mousePressed() {
+  serial.sendSerial([254,18,11,64,77]);
+}
+~~~
+
+
+
+#### getallen groter dan 255 versturen ####
 
 Omdat er maximaal een byte per keer kan worden verzonden en ontvangen moet er een manier worden verzonnen om getallen groter dan 255 te versturen. Om dit te doen kun je in de Arduino-code een getal dat groter is dan 255 op de volgende manier onderverdelen in twee getallen:
 ~~~
@@ -197,3 +245,4 @@ int sendBytes[2] = x % 256;
 Serial.write(sendBytes,4);
 ~~~
 In de javascript-code vermenigvuldig je vervolgens het eerste getal met 256 en tel je daar het tweede getal bij op.  
+
