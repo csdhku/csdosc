@@ -14,7 +14,7 @@ var oscClient = [];
 var clients = {};
 var port = []//serial port
 var matches = [];
-var portname = false;
+var name = false;
 /*----serial-communication----------/
  *---------functions----------------/
  *///-------------------------------/
@@ -22,11 +22,11 @@ var portname = false;
 //show a list of available serial devices
 serial.list(function(err,ports) {
   console.log("Serial Devices:")
-  if (process.argv[2] && process.argv[2] == "port") {
+  if (process.argv[2] && process.argv[2] == "name") {
     ports.forEach(function(sPort) {
-      console.log("portName:",sPort.comName);
+      console.log("deviceName:",sPort.comName);
     });
-    portname = true;
+    name = true;
   }
   else {
     ports.forEach(function(sPort) {
@@ -40,7 +40,7 @@ serial.list(function(err,ports) {
 function connectSerial(sn,id,baud) {
   serial.list(function(err,ports) {
     ports.forEach(function(sPort) {
-      if (portname) {
+      if (name) {
         if (sPort.comName == sn) {
           connectSerDev(sPort,id,baud);  
         }
