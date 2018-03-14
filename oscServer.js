@@ -14,7 +14,7 @@ var oscClient = [];
 var clients = {};
 var port = []//serial port
 var matches = [];
-
+var portname = false;
 /*----serial-communication----------/
  *---------functions----------------/
  *///-------------------------------/
@@ -22,9 +22,17 @@ var matches = [];
 //show a list of available serial devices
 serial.list(function(err,ports) {
   console.log("Serial Devices:")
-  ports.forEach(function(sPort) {
-    console.log("id:",sPort.serialNumber)
-  });
+  if (process.argv[2] && process.argv[2] == "port") {
+    ports.forEach(function(sPort) {
+      console.log("portName:",sPort.comName);
+    });
+    portname = true;
+  }
+  else {
+    ports.forEach(function(sPort) {
+      console.log("id:",sPort.serialNumber);
+    });  
+  }
 });
 
 //check if the given device is online, if so send it's information to connect function
@@ -32,8 +40,15 @@ serial.list(function(err,ports) {
 function connectSerial(sn,id,baud) {
   serial.list(function(err,ports) {
     ports.forEach(function(sPort) {
-      if (sPort.serialNumber == sn) {
-        connectSerDev(sPort,id,baud);
+      if (portname) {
+        if (sPort.comName == sn) {
+          connectSerDev(sPort,id,baud);  
+        }
+      }
+      else {
+        if (sPort.serialNumber == sn) {
+          connectSerDev(sPort,id,baud);
+        }  
       }
     });
   });
