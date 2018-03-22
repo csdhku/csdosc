@@ -149,7 +149,7 @@ var serial
 var connect
 
 function setup() {
-  createCanvast(800,600);
+  createCanvas(800,600);
   connect = new Connect();
   connect.connectToServer(function() {
 
@@ -208,7 +208,7 @@ var serial
 var connect
 var x = 0;
 function setup() {
-  createCanvast(800,600);
+  createCanvas(800,600);
   connect = new Connect();
   connect.connectToServer(function() {
     serial = new Serial;
