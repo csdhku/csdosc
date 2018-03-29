@@ -17,15 +17,10 @@ communicatie die je kunt gebruiken in combinatie met P5.js.
 
 ### Heb je windows? Doe eerst deze stappen ###
 * Voeg node aan je path toe. Dat doe je zo:
-    * zoek waar node.exe staat. (Meestal `C:\Program Files\nodejs` (voor 64Bit) of `C:\Program Files (x86)\nodejs` (voor 32Bit))
-    * Kopieer dit adres
-    * Open een Verkenner venster en doe een rechtermuisklik op `This PC`
-    * Kies `Properties` -> `Advanced system settings` -> `Environment Variables`
-    * Selecteer Path uit het vakje van `User Variables for <name>`
-    * Druk op `Edit`
-    * Druk op `New`
-    * Plak nu het adres van node in de lege regel
-    * Druk `OK`
+    * Open een command prompt venster
+    * Voer het volgende commando uit: `set PATH=%PATH%;C:\Program Files\nodejs` of `set PATH=%PATH%;C:\Program Files(x86)\nodejs` voor 32 bit systemen. 
+    Mocht je nodejs ergens anders op je computer staan kan verander je de locatie achter `%PATH%;`
+    * Test of dit werkt door `node` te typen (door 2 keer op `cntrl + C` te drukken sluit je dat weer af)
 * Ga nu verder waar je was bij het bovenste kopje
 
 
