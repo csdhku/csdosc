@@ -81,3 +81,18 @@ function Serial() {
     }
   }
 }
+
+function Bluetooth() {
+  return {
+    //make a connection with a bluetooth device
+    connectBluetooth: function(data) {
+      var sendData = {"id":socket.io.engine.id};
+      socket.emit('connectBluetooth',sendData);
+    },
+    receiveBluetooth: function(callback) {
+      socket.on('getBluetooth',function(data) {
+        callback(data);
+      });
+    }
+  }
+}

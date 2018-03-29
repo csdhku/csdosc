@@ -7,6 +7,7 @@ const osc = require('node-osc');
 const readline = require('readline');
 const serial = require('serialport');
 const _ = require('lodash');
+const noble = require('noble');
 
 var sendSocket = [];
 var oscServer = [];
@@ -15,6 +16,7 @@ var clients = {};
 var port = []//serial port
 var matches = [];
 var name = false;
+// var nobleId;
 /*----serial-communication----------/
  *---------functions----------------/
  *///-------------------------------/
@@ -117,6 +119,43 @@ function sendSerial(data,id) {
       }
     });
   }
+}
+
+function connectBle(id) {
+  // nobleId = id;
+  noble.on('stateChange',function(state) {
+    if (state === 'poweredOn') {
+      var serviceUuids = ['6e400001b5a3f393e0a9e50e24dcca9e'];
+      noble.startScanning(serviceUuids);
+    }
+    else {
+      noble.stopScanning();
+    }
+  });
+  receiveBle(id);
+}
+
+function receiveBle(id) {
+  noble.on('discover',function(peripheral) {
+    peripheral.connect(function(error) {
+      console.log('connected to bluetooth device:' + peripheral.uuid);
+      peripheral.discoverServices(['6e400001b5a3f393e0a9e50e24dcca9e'],function(error,services) {
+        var service = services[0];
+        service.discoverCharacteristics(['6e400003b5a3f393e0a9e50e24dcca9e'],function(error,characteristics) {
+          var chars = characteristics[0];
+          chars.on('data',function(data,isNotification) {
+            var returnData = data.toString();
+            console.log(returnData);
+            sendSocket[id].emit('getBluetooth',returnData);
+          });
+          chars.subscribe(function(error) {
+            console.log("Read data from serial");
+
+          })
+        })
+      })
+    })
+  })
 }
 
 /*--------------osc-----------------/
@@ -278,5 +317,10 @@ io.on('connection', function (socket) {
   socket.on('receiveSerial',function(data,fn) {
     fn(matches.length);
     matches.push(new Match(data.pattern,matches.length,data.id));
+  });
+
+  //bluetooth thingies
+  socket.on('connectBluetooth',function(data) {
+    connectBle(data.id);
   });
 });
