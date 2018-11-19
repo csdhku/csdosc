@@ -196,7 +196,8 @@ app.use(express.static(path.join(__dirname,'/')));
 
 //genereer errormessage als de pagina niet bestaat
 app.use(function(req,res,next) {
-  res.status(400).send("doet het niet");
+  var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+  res.status(400).send("De pagina <b>"+fullUrl+"</b> bestaat niet, heb je het goede adres ingevuld?");
 });
 
 /*----------web-socket--------------/
