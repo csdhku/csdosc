@@ -2,7 +2,7 @@ var ble;
 var x = 0;
 
 function setup() {
-  createCanvas(windowWidth,windowHeight);
+  createCanvas(windowWidth, windowHeight);
   frameRate(25);
   connect = new Connect();
 
@@ -19,6 +19,6 @@ function setup() {
 }
 
 function draw() {
- background(255);
- ellipse(x,10,10); 
+  background(255);
+  ellipse(x, 10, 10);
 }
