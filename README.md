@@ -3,17 +3,18 @@
 CSDOSC is een server gemaakt in Node.js die we gebruiken tijdens de lessen SYSBAS1A en SYSBAS1B. Het is een lokale webserver waarop je webpagina's kan draaien. Daarnaast heeft het functies voor Open Sound Control en seriële communicatie, te gebruiken in combinatie met P5.js.  
 
 ## Installatie MacOS ##
-* Download of clone alle bestanden naar je harde schijf en zet ze in een nieuwe map genaamd 'p5js' in de HKU/SYSBAS-map.
-* Download node.js via https://nodejs.org/en/download/ en installeer dit.
-* Ga in de terminal naar de map waarin je de csdosc-bestanden hebt gezet (bijvoorbeeld `cd ~/HKU/SYSBAS/p5js`) en typ hier `npm rebuild`.
+* Download of clone via de groene knop `Clone or download` alle bestanden van deze [github](https://github.com/csdhku/csdosc) naar je harde schijf en zet deze in de HKU/SYSBAS-map.
+* Als je de bestanden gedownload hebt: pak de .zip-file uit en hernoem `csdosc-master` naar `csdosc`.
+* Download node.js via [https://nodejs.org/en/download/](https://nodejs.org/en/download/) en installeer dit.
+* Ga in de terminal naar de map waarin je de csdosc-bestanden hebt gezet (bijvoorbeeld `cd ~/HKU/SYSBAS/csdosc`) en typ hier `npm rebuild`.
 * Typ nu `node oscServer.js`.
 * Je kunt de webserver nu gebruiken! 
 
 ## Installatie Windows (met gebruik van Ubuntu) ##
-* ga naar de Sysbas-folder via het commando: `cd /mnt/c/Users/Jouwnaam/HKU/Sysbas`
+* Ga naar de Sysbas-folder via het commando: `cd /mnt/c/Users/Jouwnaam/HKU/Sysbas` (of iets vergelijkbaars, afhankelijk van waar jouw HKU-bestanden staan op je harde schijf)
 * Clone de bestanden van [github](https://github.com/csdhku/csdosc) naar je schijf met het volgende commando: `git clone https://github.com/csdhku/csdosc.git`
-* ga vervolgens naar de map die binnengehaald is `cd csdosc`
-* installeer node-js door de volgende commando's in te typen:
+* Ga vervolgens naar de map die binnengehaald is: `cd csdosc`
+* Installeer node-js door de volgende commando's in te typen:
 * `sudo apt-get update`
 * `sudo apt-get install nodejs`
 * `sudo apt-get install npm`
@@ -21,6 +22,7 @@ CSDOSC is een server gemaakt in Node.js die we gebruiken tijdens de lessen SYSBA
 * Voor daarvoor het volgende commando in: `npm rebuild`
 * Typ nu `node oscServer.js`
 * Je kunt de webserver nu gebruiken!
+
 
 
 ## Gebruik ##
