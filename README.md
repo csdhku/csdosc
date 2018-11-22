@@ -8,7 +8,7 @@ CSDOSC is een server gemaakt in Node.js die we gebruiken tijdens de lessen SYSBA
 * Download node.js via [https://nodejs.org/en/download/](https://nodejs.org/en/download/) en installeer dit.
 * Ga in de terminal naar de map waarin je de csdosc-bestanden hebt gezet (bijvoorbeeld `cd ~/HKU/SYSBAS/csdosc`) en typ hier `npm rebuild`.
 * Typ nu `node oscServer.js`.
-* Je kunt de webserver nu gebruiken! 
+* Je kunt de webserver nu gebruiken!
 
 ## Installatie Windows (met gebruik van Ubuntu) ##
 * Ga naar de Sysbas-folder via het commando: `cd /mnt/c/Users/Jouwnaam/HKU/Sysbas` (of iets vergelijkbaars, afhankelijk van waar jouw HKU-bestanden staan op je harde schijf)
@@ -30,11 +30,8 @@ We gebruiken deze node-js server in eerste instantie als lokale webserver voor h
 
 * Zodra je in de terminal `node oscServer.js` intypt start de node-js server en verschijnt er de volgende mededeling: `De server staat aan! Je kunt deze via localhost:8001 bereiken`.
 * Dit betekent dat er nu een lokale webserver draait die luistert naar de poort 8001.
-* Je kunt nu in jouw favoriete webbrowser naar localhost:8001 gaat zal er een tijdelijke website verschijnen. 
-* Je kunt vervolgens een nieuwe project starten: maak in de p5js map een nieuwe map genaamd `first_sketch` en kopieer de twee bestanden `index.html` en `sketch.js` uit `empty-example` naartoe. 
-* Ga nu in de browser naar `locahost:8001/first_sketch` en je zult hier een lege p5js sketch zien. 
-* Je kunt deze sketch vervolgens aanpassen naar jouw wensen. 
+* Je kunt nu in jouw favoriete webbrowser naar localhost:8001 gaat zal er een tijdelijke website verschijnen.
+* Je kunt vervolgens een nieuwe project starten: maak in de p5js map een nieuwe map genaamd `first_sketch` en kopieer de twee bestanden `index.html` en `sketch.js` uit `empty-example` naartoe.
+* Ga nu in de browser naar `localhost:8001/first_sketch` en je zult hier een lege p5js sketch zien. 
+* Je kunt deze sketch vervolgens aanpassen naar jouw wensen.
 * Maak voor elk nieuw project een nieuwe map en gebruik de voorbeelden uit `empty-example` als basis.
-
-
-
