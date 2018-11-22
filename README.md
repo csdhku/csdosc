@@ -8,9 +8,9 @@ CSDOSC is een server gemaakt in Node.js die we gebruiken tijdens de lessen SYSBA
 * Download node.js via [https://nodejs.org/en/download/](https://nodejs.org/en/download/) en installeer dit.
 * Ga in de terminal naar de map waarin je de csdosc-bestanden hebt gezet (bijvoorbeeld `cd ~/HKU/SYSBAS/csdosc`) en typ hier:
 ```
-npm remove serialport
-npm install serialport
-npm rebuild
+npm remove serialport  
+npm install serialport  
+npm rebuild  
 ```
 * Typ nu `node oscServer.js`.
 * Je kunt de webserver nu gebruiken!
@@ -24,7 +24,7 @@ npm rebuild
 * `sudo apt-get install nodejs`
 * `sudo apt-get install npm`
 * Vervolgens moet je de osc-server app configureren voor jouw systeem:
-* Voor daarvoor de volgende commando's in:
+* Voer daarvoor de volgende commando's in:
 ```
 npm remove serialport
 npm install serialport
