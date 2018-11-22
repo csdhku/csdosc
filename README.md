@@ -7,11 +7,10 @@ CSDOSC is een server gemaakt in Node.js die we gebruiken tijdens de lessen SYSBA
 * Als je de bestanden gedownload hebt: pak de .zip-file uit en hernoem `csdosc-master` naar `csdosc`.
 * Download node.js via [https://nodejs.org/en/download/](https://nodejs.org/en/download/) en installeer dit.
 * Ga in de terminal naar de map waarin je de csdosc-bestanden hebt gezet (bijvoorbeeld `cd ~/HKU/SYSBAS/csdosc`) en typ hier:
-```
-npm remove serialport  
-npm install serialport  
-npm rebuild  
-```
+`npm remove serialport`  
+`npm install serialport`  
+`npm rebuild`  
+
 * Typ nu `node oscServer.js`.
 * Je kunt de webserver nu gebruiken!
 
@@ -19,17 +18,16 @@ npm rebuild
 * Ga naar de Sysbas-folder via het commando: `cd /mnt/c/Users/Jouwnaam/HKU/Sysbas` (of iets vergelijkbaars, afhankelijk van waar jouw HKU-bestanden staan op je harde schijf)
 * Clone de bestanden van [github](https://github.com/csdhku/csdosc) naar je schijf met het volgende commando: `git clone https://github.com/csdhku/csdosc.git`
 * Ga vervolgens naar de map die binnengehaald is: `cd csdosc`
-* Installeer node-js door de volgende commando's in te typen:
-* `sudo apt-get update`
-* `sudo apt-get install nodejs`
-* `sudo apt-get install npm`
+* Installeer node-js door de volgende commando's in te typen:  
+`sudo apt-get update`  
+`sudo apt-get install nodejs`  
+`sudo apt-get install npm`  
 * Vervolgens moet je de osc-server app configureren voor jouw systeem:
-* Voer daarvoor de volgende commando's in:
-```
-npm remove serialport
-npm install serialport
-npm rebuild
-```
+* Voer daarvoor de volgende commando's in:  
+`npm remove serialport`  
+`npm install serialport`  
+`npm rebuild`  
+
 * Typ nu `node oscServer.js`
 * Je kunt de webserver nu gebruiken!
 
