@@ -43,3 +43,15 @@ We gebruiken deze node-js server in eerste instantie als lokale webserver voor h
 * Ga nu in de browser naar `localhost:8001/first_sketch` en je zult hier een lege p5js sketch zien.
 * Je kunt deze sketch vervolgens aanpassen naar jouw wensen.
 * Maak voor elk nieuw project een nieuwe map en gebruik de voorbeelden uit `empty-example` als basis.
+
+## OSC ##
+Naast dat het programma oscServer.js dient als webserver om P5js-projecten in je browser te laten zien wordt het ook gebruikt als Open Sound Control (OSC)-server. Met OSC kan je aansturingsberichten via een netwerk sturen naar andere applicaties die dit protocol ondersteunen. Voorbeelden hiervan zijn Max, Pure Data, Supercollider, Reaper, Live en Logic. Je kunt OSC enigszins vergelijken met midi. Met als groot voordeel dat je niet gelimiteerd bent tot een range van 128 waardes.  
+Een OSC-bericht bestaat uit twee onderdelen. Een adres en een waarde. Het adres is opgebouwd uit een of meer delen, elk gescheiden door een `/`. Bijvoorbeeld: `/synth/oscillator1/pitch` of `/x`. De waarde kan van alles zijn, een integer, floating point getal of een stukje tekst. Een compleet OSC-bericht kan er dus als volgt uitzien: `/synth/filter/cutoff 500` of `/synth/filter/mode lpf` of `/synth/amplitude 0.5`. 
+
+In bovenstaande git-repository zijn twee voorbeeldsketches toegevoegd die de werking van OSC laten zien binnen `oscServer.js`. Dit zijn `example_server` en `example_client`. 
+### server ###
+In `example_server` staat een voorbeeld van een sketch die luistert naar berichten die worden verstuurd naar poort 9000. Een OSC-server staat open op één specifieke poort. Alle berichten die naar die poort worden vestuurd worden ontvangen door de server, ongeacht van welk IP-adres ze afkomstig zijn.  
+In het voorbeeld staat per regel code uitgelegd wat het doet in de sketch.
+
+### client ###
+In `example_client` staat een voorbeeld van een sketch die berichten verstuurt naar een specifieke poort op een specifiek IP-adres. In dit geval poort 9000 op het IP-adres 127.0.0.1. Het IP-adres 127.0.0.1 is het adres op berichten binnen je eigen computer te versturen. In het voorbeeld staat per regel code uitgelegd wat het doet in de sketch.
