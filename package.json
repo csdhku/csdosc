@@ -18,10 +18,10 @@
   },
   "homepage": "https://github.com/csdhku/csdosc#readme",
   "dependencies": {
-    "express": "^4.16.2",
-    "lodash": "4.17.5",
-    "node-osc": "^2.1.0",
-    "serialport": "6.1.1",
-    "socket.io": "^2.0.4"
+    "express": "^4.17.1",
+    "lodash": "4.17.14",
+    "node-osc": "^4.1.0",
+    "serialport": "7.1.5",
+    "socket.io": "^2.2.0"
   }
 }
