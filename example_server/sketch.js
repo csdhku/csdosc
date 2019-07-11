@@ -23,7 +23,7 @@ function setup() {
 
     //als de server een bericht ontvangt voert deze de functie oscReceiver uit en geeft deze twee argumenten mee: address en msg.
     server.getMessage(function(address,msg) {
-      oscReceiver(add,msg);
+      oscReceiver(address,msg);
     });
   });
   x = 100;
