@@ -21,7 +21,6 @@
     "express": "^4.17.1",
     "lodash": "4.17.14",
     "node-osc": "^4.1.0",
-    "serialport": "7.1.5",
     "socket.io": "^2.2.0"
   }
 }
