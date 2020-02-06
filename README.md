@@ -13,6 +13,7 @@ CSDOSC is een server gemaakt in Node.js die we gebruiken tijdens de lessen SYSBA
 * Je kunt de webserver nu gebruiken!
 
 ## Installatie Windows (met gebruik van Ubuntu) ##
+* Als je Ubuntu nog niet hebt geïnstalleerd, volg dan de stappen in de [Syllabus](https://csd.hku.nl/csd1/languages/schemebook/hoofdstuk-9.html)
 * Ga naar de Sysbas-folder via het commando: `cd /mnt/c/Users/Jouwnaam/HKU/Sysbas` (of iets vergelijkbaars, afhankelijk van waar jouw HKU-bestanden staan op je harde schijf)
 * Clone de bestanden van [github](https://github.com/csdhku/csdosc) naar je schijf met het volgende commando: `git clone https://github.com/csdhku/csdosc.git`
 * Ga vervolgens naar de map die binnengehaald is: `cd csdosc`
