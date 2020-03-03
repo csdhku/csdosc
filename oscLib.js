@@ -29,7 +29,9 @@ function Client() {
       let sendData = {"ip":address,"port":port,"id":socket.io.engine.id};
       socket.emit('startClient',sendData);
     },
-    sendMessage: function(address,message) {
+    sendMessage: function(...data) {
+      let address = data.shift();
+      let message = data;
       let sendData = {"address":address,"message":message,"id":socket.io.engine.id};
       socket.emit('sendMessage',sendData);
     },
@@ -47,7 +49,11 @@ function Server() {
     },
     getMessage: function(callback) {
       socket.on('getMessage',function(data){
-        callback(data.add,data.msg);
+        let msg = data.msg;
+        if (data.msg.length == 1) {
+          msg = data.msg[0];
+        }
+        callback(data.add,msg);
       });
     },
     killServer : function() {

@@ -72,7 +72,7 @@ function killOsc() {
 
 //start the server listening on port 8001
 server.listen(8001,function() {
-  console.log("De server staat aan! Je kunt deze via localhost:8001 bereiken");
+  console.log("De server staat aan! Je kunt deze via localhost:8001 bereiken.\nJe kunt dit programma afsluiten door stop+enter te typen");
 });
 
 //zorg dat de server alle paths kan bereiken. 
@@ -114,8 +114,10 @@ io.on('connection', function (socket) {
 
       sendSocket[data.id].emit("serverRunning",{"port":data.port});
         
-      oscServer[data.id].on("message",function(msg,rinfo) {
-        let sendData = {"add":msg[0],"msg":msg[1]};
+      oscServer[data.id].on("message",function([...msg],rinfo) {
+        let address = msg.shift();
+        let message = msg;
+        let sendData = {"add":address,"msg":message};
         sendSocket[data.id].emit('getMessage',sendData);
       });
     });
