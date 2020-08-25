@@ -23,6 +23,43 @@ function Connect() {
   }
 }
 
+function Lilypond() {
+  return {
+    setTempo(value) {
+      let sendData = {"target":"tempo","value":value}
+      socket.emit('lilypond',sendData);
+    },
+    setArtist(value) {
+      let sendData = {"target":"artist","value":value}
+      socket.emit('lilypond',sendData);
+    },
+    setTitle(value) {
+      let sendData = {"target":"title","value":value}
+      socket.emit('lilypond',sendData);
+    },
+    setKey(value) {
+      let sendData = {"target":"title","value":value}
+      socket.emit('lilypond',sendData);
+    },
+    setNotes(value, score="main") {
+      let sendData = {"target":"notes","value":value,"score":score}
+      socket.emit('lilypond',sendData);
+    },
+    setDuration(value, score="main") {
+      let sendData = {"target":"duration","value":value,"score":score}
+      socket.emit('lilypond',sendData);
+    },
+    setInstrument(value, score="main") {
+      let sendData = {"target":"instrument","value":value,"score":score}
+      socket.emit('lilypond',sendData);
+    },
+    createScore(file) {
+      let sendData = {"target":"make","value":file}
+      socket.emit('lilypond',sendData);
+    }
+  }
+}
+
 function Client() {
   return {
     startClient: function(address,port) {

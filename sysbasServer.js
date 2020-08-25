@@ -6,6 +6,7 @@ const io = require('socket.io')(server);
 const osc = require('node-osc');
 const readline = require('readline');
 const _ = require('lodash');
+const Lilypond = require('./Lilypond').Lilypond;
 
 let sendSocket = [];
 let oscServer = [];
@@ -145,5 +146,10 @@ io.on('connection', function (socket) {
       oscClient[data.id].send(data.address, data.message, function () {
       });  
     }
+  });
+
+  //on receiving lilypond-data
+  socket.on('lilypond',data => {
+    Lilypond.setData(data);
   });
 });

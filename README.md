@@ -9,7 +9,7 @@ CSDOSC is een server gemaakt in Node.js die we gebruiken tijdens de lessen SYSBA
 * Ga in de terminal naar de map waarin je de csdosc-bestanden hebt gezet (bijvoorbeeld `cd ~/HKU/SYSBAS/csdosc`) en typ hier: 
 `npm install`  
 
-* Typ nu `node oscServer.js`.
+* Typ nu `node sysbasServer.js`.
 * Je kunt de webserver nu gebruiken!
 
 ## Installatie Windows (met gebruik van Ubuntu) ##
@@ -25,7 +25,7 @@ CSDOSC is een server gemaakt in Node.js die we gebruiken tijdens de lessen SYSBA
 * Voer daarvoor de volgende commando's in:  
 `npm install`  
 
-* Typ nu `node oscServer.js`
+* Typ nu `node sysbasServer.js`
 * Je kunt de webserver nu gebruiken!
 
 
@@ -33,7 +33,7 @@ CSDOSC is een server gemaakt in Node.js die we gebruiken tijdens de lessen SYSBA
 ## Gebruik ##
 We gebruiken deze node-js server in eerste instantie als lokale webserver voor het weergeven van html-bestanden in de browser. Hiermee kunnen we p5js projecten bekijken. Een exrtra functie: OSC-communicatie komt later aan bod.
 
-* Zodra je in de terminal `node oscServer.js` intypt start de node-js server en verschijnt er de volgende mededeling: `De server staat aan! Je kunt deze via localhost:8001 bereiken`.
+* Zodra je in de terminal `node sysbasServer.js` intypt start de node-js server en verschijnt er de volgende mededeling: `De server staat aan! Je kunt deze via localhost:8001 bereiken`.
 * Dit betekent dat er nu een lokale webserver draait die luistert naar de poort 8001.
 * Je kunt nu in jouw favoriete webbrowser naar localhost:8001 gaat zal er een tijdelijke website verschijnen.
 * Je kunt vervolgens een nieuwe project starten: maak in de p5js map een nieuwe map genaamd `first_sketch` en kopieer de twee bestanden `index.html` en `sketch.js` uit `empty-example` daarnaartoe.
@@ -42,10 +42,10 @@ We gebruiken deze node-js server in eerste instantie als lokale webserver voor h
 * Maak voor elk nieuw project een nieuwe map en gebruik de voorbeelden uit `empty-example` als basis.
 
 ## OSC ##
-Naast dat het programma oscServer.js dient als webserver om P5js-projecten in je browser te laten zien wordt het ook gebruikt als Open Sound Control (OSC)-server. Met OSC kan je aansturingsberichten via een netwerk sturen naar andere applicaties die dit protocol ondersteunen. Voorbeelden hiervan zijn Max, Pure Data, Supercollider, Reaper, Live en Logic. Je kunt OSC enigszins vergelijken met midi. Met als groot voordeel dat je niet gelimiteerd bent tot een range van 128 waardes.  
+Naast dat het programma sysbasServer.js dient als webserver om P5js-projecten in je browser te laten zien wordt het ook gebruikt als Open Sound Control (OSC)-server. Met OSC kan je aansturingsberichten via een netwerk sturen naar andere applicaties die dit protocol ondersteunen. Voorbeelden hiervan zijn Max, Pure Data, Supercollider, Reaper, Live en Logic. Je kunt OSC enigszins vergelijken met midi. Met als groot voordeel dat je niet gelimiteerd bent tot een range van 128 waardes.  
 Een OSC-bericht bestaat uit twee onderdelen. Een adres en een waarde. Het adres is opgebouwd uit een of meer delen, elk gescheiden door een `/`. Bijvoorbeeld: `/synth/oscillator1/pitch` of `/x`. De waarde kan van alles zijn, een integer, floating point getal of een stukje tekst. Een compleet OSC-bericht kan er dus als volgt uitzien: `/synth/filter/cutoff 500` of `/synth/filter/mode lpf` of `/synth/amplitude 0.5`. 
 
-In bovenstaande git-repository zijn twee voorbeeldsketches toegevoegd die de werking van OSC laten zien binnen `oscServer.js`. Dit zijn `example_server` en `example_client`. 
+In bovenstaande git-repository zijn twee voorbeeldsketches toegevoegd die de werking van OSC laten zien binnen `sysbasServer.js`. Dit zijn `example_server` en `example_client`. 
 ### server ###
 In `example_server` staat een voorbeeld van een sketch die luistert naar berichten die worden verstuurd naar poort 9000. Een OSC-server staat open op één specifieke poort. Alle berichten die naar die poort worden vestuurd worden ontvangen door de server, ongeacht van welk IP-adres ze afkomstig zijn.  
 In het voorbeeld staat per regel code uitgelegd wat het doet in de sketch.
