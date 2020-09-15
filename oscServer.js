@@ -5,6 +5,9 @@ const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const osc = require('node-osc');
 const readline = require('readline');
+const fs = require('fs');
+const http = require('http');
+const https = require('https');
 const _ = require('lodash');
 
 let sendSocket = [];
@@ -48,15 +51,31 @@ const rl = readline.createInterface({
   input: process.stdin
 });
 
-//if input is any of these words, quit the program
+//check the code that is given by the user. 
 rl.on('line', (input) => {
+  //quit the program when one of these words is used.
   if (input == "quit" || input == "stop" || input == "hou op!") {
     killOsc();
     process.exit(0);
   }
+  //start the update process 
+  if (input == "update") {
+    requestUpdate();
+  }
 });
 
-// close all ports etc.
+async function requestUpdate() {
+  await downloadFile('https://csd.hku.nl/sysbas/csdoscHelper/updateState.txt','./.updateState.txt')
+  .then(getUpdateState)
+  .then(downloadFile('https://csd.hku.nl/sysbas/csdoscHelper/filesToUpdate.txt','./.filesToUpdate.txt'))
+  .then(startUpdate)
+  .then(doUpdate)
+  .then(updateSucces).catch(error => {
+    console.log(error);
+  });
+}
+
+// close any of the available OSC instances, client and servers.
 function killOsc() {
   oscServer.forEach(s => {
     if (s)s.close();
@@ -147,3 +166,117 @@ io.on('connection', function (socket) {
     }
   });
 });
+
+
+//all the functions for updating this code.
+async function downloadFile(url, filePath) {
+  const proto = !url.charAt(4).localeCompare('s') ? https : http;
+
+  return new Promise((resolve, reject) => {
+    const file = fs.createWriteStream(filePath);
+    let fileInfo = null;
+
+    const request = proto.get(url, response => {
+      if (response.statusCode !== 200) {
+        reject(`Failed to get '${url}' (${response.statusCode})`);
+        return;
+      }
+
+      fileInfo = {
+        mime: response.headers['content-type'],
+        size: parseInt(response.headers['content-length'], 10),
+      };
+
+      response.pipe(file);
+    });
+
+    // The destination stream is ended by the time it's called
+    file.on('finish', () => resolve(fileInfo));
+
+    request.on('error', err => {
+      fs.unlink(filePath, () => reject(err));
+    });
+
+    file.on('error', err => {
+      fs.unlink(filePath, () => reject(err));
+    });
+
+    request.end();
+  });
+}
+
+async function getUpdateState() {
+  return new Promise((resolve, reject) => {
+    fs.readFile('./.lastUpdate.txt','utf8', (err,lastDay) => {
+      if (err)reject ("er ging iets fout...");
+      let lastUpdate = new Date(lastDay);
+      fs.readFile('./.updateState.txt', 'utf8', (err,data) => {
+        if (err) {
+          reject(`can't read update file`);
+        }
+        else {
+          newestUpdate = new Date(data.replace(/(\r\n|\n|\r)/gm,""));
+          if (lastUpdate < newestUpdate) {
+            resolve();
+          }
+          else {
+            reject("Er is op dit moment geen update beschikbaar");
+          }
+        }
+      });
+    })
+  })  
+}
+
+async function startUpdate() {
+  return new Promise((resolve,reject) => {
+    fs.readFile('./.filesToUpdate.txt','utf8',(err,data) => {
+      if (err) {
+        reject(`no files found to update`)
+      }
+      else {
+        let updateList = data.split("\n")
+        resolve(updateList);
+      }
+    })
+  });
+}
+
+async function doUpdate(list) {
+  return new Promise(async (resolve, reject) => {
+    for (let i = 0; i < list.length; i++) {
+      if (list[i] !== '') {
+        await downloadFile('https://csd.hku.nl/sysbas/csdoscHelper/csdosc/'+list[i],list[i])
+        .catch( error => {
+          reject(error);
+        })
+      }
+    }
+    resolve("De update is geslaagd! Dit programma zal nu worden afgesloten, start het daarna opnieuw op door npm start te typen");
+  });
+}
+
+async function updateSucces(result) {
+  let today = formatDate();
+  fs.writeFile('./.lastUpdate.txt',today,'utf8',error => {
+    if (error)console.log(error);
+    console.log(result);  
+    killOsc()
+    process.exit(0);
+  });
+  
+}
+
+function formatDate() {
+  var d = new Date(),
+      month = '' + (d.getMonth() + 1),
+      day = '' + d.getDate(),
+      year = d.getFullYear();
+
+  if (month.length < 2) 
+      month = '0' + month;
+  if (day.length < 2) 
+      day = '0' + day;
+
+  return [year, month, day].join('-');
+}
