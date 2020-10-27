@@ -41,6 +41,14 @@ function Client() {
   } 
 }
 
+function makeNote(note=60,dur=0.5) {
+  let env = new p5.Envelope(0.01,dur,0.0,0.0);
+  let triOsc = new p5.Oscillator('triangle');
+  triOsc.freq(midiToFreq(note));
+  triOsc.start();
+  env.play(triOsc);
+}
+
 function Server() {
   return {
     startServer: function(port) {
