@@ -32,8 +32,16 @@ function Client() {
     sendMessage: function(...data) {
       let address = data.shift();
       let message = data;
-      let sendData = {"address":address,"message":message,"id":socket.io.engine.id};
-      socket.emit('sendMessage',sendData);
+      if (message === undefined || message.length === 0) {
+        console.error(`je moet een waarde meegeven, alleen een adres is niet goed genoeg.`);
+      }
+      else if (message < -2147483648 || message > 2147483647) {
+        console.error(`Getal is te klein of te groot\nHet getal mag niet kleiner zijn dan -2147483648 en groter dan 2147483647.\nhet getal dat je probeert te versturen is ${message}`)
+      }
+      else {
+        let sendData = {"address":address,"message":message,"id":socket.io.engine.id};
+        socket.emit('sendMessage',sendData);
+      }
     },
     killClient: function() {
       socket.emit('killClient');

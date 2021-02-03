@@ -34,9 +34,11 @@ function draw() {
 }
 
 function mouseMoved() {
-  //stuur een bericht naar het adres /x met als waarde de x-positie van de muis
-  client.sendMessage("/x",mouseX);
+  if (client) {
+    //stuur een bericht naar het adres /x met als waarde de x-positie van de muis
+    client.sendMessage("/x",mouseX);
 
-  //stuur een bericht naar het adres /y met als waarde de y-positie van de muis.
-  client.sendMessage("/y",mouseY);
+    //stuur een bericht naar het adres /y met als waarde de y-positie van de muis.
+    client.sendMessage("/y",mouseY);
+  }
 }
