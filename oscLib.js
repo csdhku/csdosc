@@ -35,6 +35,9 @@ function Client() {
       if (message === undefined || message.length === 0) {
         console.error(`je moet een waarde meegeven, alleen een adres is niet goed genoeg.`);
       }
+      if (message[0] === undefined) {
+        console.error(`je probeert ${message[0]} te sturen, dat kan niet. Zorg dat de variabele die je verstuurt een waarde heeft.`);
+      }
       else if (message < -2147483648 || message > 2147483647) {
         console.error(`Getal is te klein of te groot\nHet getal mag niet kleiner zijn dan -2147483648 en groter dan 2147483647.\nhet getal dat je probeert te versturen is ${message}`)
       }
