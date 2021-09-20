@@ -4,7 +4,6 @@
 
 //aanmaken van de benodigde variabelen.
 let client;
-let connect;
 let x, y;
 
 function setup() {
