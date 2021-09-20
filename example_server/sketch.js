@@ -36,13 +36,13 @@ function draw() {
 }
 
 //de functie die aangeroepen wordt als er OSC-data binnenkomt
-function oscReceiver(address,msg) {
+function oscReceiver(address,value) {
   //als de variabele address gelijk is aan /y wordt de code tussen de {} uitegevoerd
   if (address === "/y") {
-    y = msg;
+    y = value;
   }
   //als de variabele address gelijk is aan /x wordt de code tussen de {} uitegevoerd
   else if (address == "/x") {
-    x = msg;
+    x = value;
   }
 }
