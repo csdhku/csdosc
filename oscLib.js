@@ -1,6 +1,6 @@
 const socket = io.connect();
 let connected = 0;
-let env, triOsc;
+let polySynth;
 
 //stuurt socket-id door naar oscServer.js
 socket.on('connect', _=> {
@@ -130,15 +130,13 @@ class Server {
 
 
 function makeNoteSetup() {
-  env = new p5.Envelope();
-  triOsc = new p5.Oscillator('triangle');
+  polySynth = new p5.PolySynth()
 }
 
 function makeNote(note=60,velo=0.5,dur=0.0) {
-  env.setADSR(0.01,velo,0,velo,dur,velo);
-  triOsc.freq(midiToFreq(note));
-  triOsc.start();
-  env.play(triOsc);
+  userStartAudio();
+  //console.log("Making note", int(note), "with vel", int(velo), "and duration", dur, "ms")
+  polySynth.play(midiToFreq(note), int(velo), 0.0, dur / 1000.)
 }
 
 
