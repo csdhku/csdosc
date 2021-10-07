@@ -133,11 +133,11 @@ function makeNoteSetup() {
   polySynth = new p5.PolySynth()
 }
 
-function makeNote(note=60,velo=0.5,dur=0.0) {
+function makeNote(note=60,velo=0.5,dur=100.0) {
   userStartAudio();
   if (getAudioContext().state != 'running') {
-    console.warn("Audio is not loaded. Click on the screen to enable audio!\n", "Making note", int(note), "with vel", int(velo), "and duration", dur, "ms")
-  } else polySynth.play(midiToFreq(note), int(velo), 0.0, dur / 1000.)
+    console.warn("Audio is not loaded. Click on the screen to enable audio!\n", "Making note", int(note), "with vel", velo, "and duration", dur, "ms")
+  } else polySynth.play(midiToFreq(note), velo, 0.0, dur / 1000.);
 }
 
 
