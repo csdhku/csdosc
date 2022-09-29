@@ -1,7 +1,14 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>P5js-example</title>
+    <title id="page-title"></title>
+    
+    <script>
+      var loc = window.location.pathname;
+      var dir = loc.substring(1, loc.lastIndexOf('/'));
+      document.getElementById("page-title").innerHTML = dir;
+    </script>
+
     <script src="../Library/p5.min.js"></script>
     <script src="../Library/addons/p5.sound.min.js"></script>
     <script src="../Library/socket_io.js"></script>
