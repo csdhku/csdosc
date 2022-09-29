@@ -25,7 +25,7 @@ CSDOSC is een server gemaakt in Node.js die we gebruiken tijdens de lessen SYSBA
 * Voer daarvoor de volgende commando's in:  
 `npm install`  
 
-* Typ nu `node oscServer.js`
+* Typ nu `npm start`
 * Je kunt de webserver nu gebruiken!
 
 
