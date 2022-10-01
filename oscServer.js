@@ -142,7 +142,7 @@ function printPage (body) {
           text-align: left;
         }
         table.folderTable th {
-          background-color: #888;
+          background-color: #8888ff;
           color: white;
         }
         table.folderTable tr:nth-child(even) {
