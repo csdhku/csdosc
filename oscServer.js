@@ -97,11 +97,109 @@ server.listen(8001,function() {
 //zorg dat de server alle paths kan bereiken. 
 app.use(express.static(path.join(__dirname,'/')));
 
+app.use(function(req,res,next) {
+  if (req.originalUrl == '/') {
+    const folderPath = path.join(__dirname, req.originalUrl)
+    const response = `
+    <head>
+      <title>Welkom bij de csdosc startpagina!</title>
+    </head>
+    <body>
+      <div style='background-color:#DDDDDD;font-size: 14px;text-align: center'>
+        Welkom bij de csdosc-startpagina!<br><br>
+        Voor meer informatie over het gebruik van deze library ga je naar <a href = "https://csd.hku.nl" target="_blank">csd.hku.nl</a>
+      </div>
+      ${generateFileList(folderPath)}
+    </body>
+`
+    res.status(400).send(response);
+  }
+  else next()
+})
+
 //genereer errormessage als de pagina niet bestaat
 app.use(function(req,res,next) {
-  let fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-  res.status(400).send("De pagina <b>"+fullUrl+"</b> bestaat niet, heb je het goede adres ingevuld?");
+  const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+  const filePath = path.join(__dirname, req.originalUrl)
+  if (!fs.existsSync(filePath)) res.status(400).send("De pagina <b>"+fullUrl+"</b> bestaat niet, heb je het goede adres ingevuld?");
+  else next()
+})
+
+//print een lijst als de request een folder is
+app.use(function(req,res,next) {
+  const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+  const folderPath = path.join(__dirname, req.originalUrl)
+  const stats = fs.statSync(folderPath);
+
+  // Check if requested file is a directory
+  if (stats.isDirectory()) {
+    const folderPath = path.join(__dirname, req.originalUrl)
+    res.status(400).send(`Inhoud van de folder: <b>${fullUrl}</b>${generateFileList(folderPath)}`);
+  } else next()
 });
+
+// Genereer een lijst met de inhoud van de folder
+function generateFileList (folderPath) {
+  const stats = fs.statSync(folderPath);
+  const ignorableNames = ['.DS_Store', 'node_modules', '.gitignore', '.git', 'Library']
+  let response = ''
+
+  // Check if requested file is a directory
+  if (stats.isDirectory()) {
+    // get folder content, filter out ignorable files
+    const folderContent = fs.readdirSync(folderPath, { withFileTypes: true }).filter((e)=>!ignorableNames.includes(e.name))
+    // Map to more usefull data
+    const mappedContent = folderContent.map((e)=>{
+      const filePath = path.join(folderPath, e.name)
+      const fileStats = fs.statSync(filePath);
+      return {
+        name: e.name,
+        path: filePath,
+        extension: path.extname(filePath).replace('.', ''),
+        isDirectory: fileStats.isDirectory(),
+        isHidden: (/(^|\/)\.[^\/\.]/g).test(e.name)
+      }
+    });
+
+    // Create a clickable table with the content of the folder
+    response = `
+    <style>
+        table.folderTable {
+          margin-top: 10px;
+          width: 100%;
+          border: 1px solid #ddd;
+          border-collapse: collapse;
+          font-family: Arial, sans-serif;
+        }
+        table.folderTable th, td {
+          padding: 5px 10px;
+          text-align: left;
+        }
+        table.folderTable th {
+          background-color: #888;
+          color: white;
+        }
+        table.folderTable tr:nth-child(even) {background-color: #f2f2f2;}
+        table.folderTable tr.entryRow:hover {background-color: #ddd; cursor: pointer;}
+      </style>
+    <table class="folderTable">
+      <tr>
+        <th>Filename</th>
+      </tr>
+      <tr class="entryRow" onclick="window.location='..';">
+        <td>..</td>
+      </tr>
+      ${mappedContent.filter((e)=>!e.isHidden && e.isDirectory).map((e) => {
+        return `
+          <tr class="entryRow" onclick="window.location='${ e.name }';">
+            <td>${ e.name }</td>
+          </tr>
+        `
+      }).join('\n')}
+    </table>`
+  }
+  return response
+}
 
 /*----------web-socket--------------/
  *----------------------------------/
