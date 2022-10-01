@@ -1,0 +1,53 @@
+/* ----------------- Start CSS Reset ----------------- */
+/* RESET margin */
+body, html {
+    padding: 0px;
+    margin: 0px;
+}
+/* RESET margin */
+h1, h2, h3, h4, h5, h6 {
+    margin-block-start: 0px;
+    margin-block-end: 0px;
+}
+/* ------------------ End CSS Reset ------------------ */
+
+body {
+    font-family: Arial, sans-serif;
+    background: #E0E0E0;
+    padding: 0px;
+    margin: 10px;
+}
+
+.card {
+    background: white;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    border-radius: 10px;
+    overflow: hidden;
+}
+.card.padding {
+    padding: 10px;
+}
+.text-center {
+    text-align: center;
+}
+
+table.folderTable {
+    margin-top: 10px;
+    width: 100%;
+    border-collapse: collapse;
+}
+table.folderTable th, td {
+    padding: 5px 10px;
+    text-align: left;
+}
+table.folderTable th {
+    background-color: #8888ff;
+    color: white;
+}
+table.folderTable tr:nth-child(even) {
+    background-color: #f0f0f0;
+}
+table.folderTable tr.entryRow:hover {
+    background-color: #ddd;
+    cursor: pointer;
+}

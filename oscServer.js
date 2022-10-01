@@ -95,126 +95,100 @@ function killOsc() {
  * @returns {String} The HTML output
  */
 function printPage (body) {
- return `
+ return `<html>
     <head>
       <title>Welkom bij de csdosc startpagina!</title>
-      <style>
-        /* ----------------- Start CSS Reset ----------------- */
-        /* RESET margin */
-        body, html {
-          padding: 0px;
-          margin: 0px;
-        }
-        /* RESET margin */
-        h1, h2, h3, h4, h5, h6 {
-          margin-block-start: 0px;
-          margin-block-end: 0px;
-        }
-        /* ------------------ End CSS Reset ------------------ */
-
-        body {
-          font-family: Arial, sans-serif;
-          background: #E0E0E0;
-          padding: 0px;
-          margin: 10px;
-        }
-
-        .card {
-          background: white;
-          box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-          border-radius: 10px;
-          overflow: hidden;
-        }
-        .card.padding {
-          padding: 10px;
-        }
-        .text-center {
-          text-align: center;
-        }
-
-        table.folderTable {
-          margin-top: 10px;
-          width: 100%;
-          border-collapse: collapse;
-        }
-        table.folderTable th, td {
-          padding: 5px 10px;
-          text-align: left;
-        }
-        table.folderTable th {
-          background-color: #8888ff;
-          color: white;
-        }
-        table.folderTable tr:nth-child(even) {
-          background-color: #f0f0f0;
-        }
-        table.folderTable tr.entryRow:hover {
-          background-color: #ddd;
-          cursor: pointer;
-        }
-      </style>
+      <link rel="stylesheet" href="/Library/style.css" />
     </head>
-    <body>
-      ${body}
-    </body>
-  `
+    <body>${body}</body>
+  </html>`;
 }
 
 /**
  * Genereer een lijst met de inhoud van de folder
  * @param {String} folderPath path to be shown
+ * @param {Object} options options for the list generation
  * @returns {String} The HTML output
  */
-function generateFileList (folderPath) {
+function generateFileList (folderPath, options = {}) {
   const stats = fs.statSync(folderPath);
-  const ignorableNames = ['.DS_Store', 'node_modules', '.gitignore', '.git', 'Library']
-  let response = ''
+  const ignorableNames = [
+    // Directories
+    /.git$/,
+    /^\/node_modules$/,
+    /^\/Library$/,
+    
+    // Files in root
+    /^\/.filesToUpdate.txt$/,
+    /^\/.lastUpdate.txt$/,
+    /^\/.updateState.txt$/,
+    /^\/LICENSE$/,
+    /^\/README.md$/,
+    /^\/favicon.ico$/,
+    /^\/oscServer.js$/,
+    /^\/oscLib.js$/,
+    /^\/package(-lock)?.json$/,
+    
+    // Files from all directories
+    /.DS_Store$/,
+    /.gitignore$/,
+  ];
+  
+  const showHidden = options.showHidden || false;
+  const showFiles = options.showFiles || false;
 
   // Check if current folder is the root path (with fix for trailing '/')
   const isRoot = path.join(folderPath, '/.') == path.join(__dirname, '/.')
 
-  // Check if requested file is a directory
-  if (stats.isDirectory()) {
-    // get folder content, filter out ignorable files
-    const folderContent = fs.readdirSync(folderPath, { withFileTypes: true }).filter((e)=>!ignorableNames.includes(e.name))
-    
-    // Map to more useful data
-    const mappedContent = folderContent.map((e)=>{
-      const filePath = path.join(folderPath, e.name)
-      const fileStats = fs.statSync(filePath);
-      return {
-        name: e.name,
-        path: filePath,
-        extension: path.extname(filePath).replace('.', ''),
-        isDirectory: fileStats.isDirectory(),
-        isHidden: (/(^|\/)\.[^\/\.]/g).test(e.name)
-      }
-    });
+  // Return if the requested path is not a directory
+  if (!stats.isDirectory()) return ''
 
-    // Create a clickable table with the content of the folder
-    response = `
-    <table class="folderTable card">
-      <tr>
-        <th>Naam</th>
-      </tr>
-      ${ // Show table row for up (..) if not root path
-        isRoot?'':
-        `<tr class="entryRow" onclick="window.location='..';">
-          <td>..</td>
-        </tr>`
-      }
-      
-      ${ // Iterate over mappedContent and generate table row
-        mappedContent.filter((e)=>!e.isHidden && e.isDirectory).map((e) => {
-        return `
-          <tr class="entryRow" onclick="window.location='${ e.name }';">
-            <td>${ e.name }</td>
-          </tr>
-        `
-      }).join('\n')}
-    </table>`
+  // Get folder content, filter out ignorable files using regex
+  const folderContent = fs.readdirSync(folderPath, { withFileTypes: true }).filter((e) => {
+    const filePath = path.join(folderPath, e.name).replace(__dirname, '')
+    for (const ignorableName of ignorableNames) {
+      if (ignorableName.test(filePath)) return false
+    }
+    return true
+  })
+  
+  // Map array to more useful data
+  const mappedContent = folderContent.map((e)=>{
+    const filePath = path.join(folderPath, e.name)
+    const fileStats = fs.statSync(filePath);
+    return {
+      name: e.name,
+      path: filePath,
+      extension: path.extname(filePath).replace('.', ''),
+      isDirectory: fileStats.isDirectory(),
+      isHidden: (/(^|\/)\.[^\/\.]/g).test(e.name)
+    }
+  });
+
+  // Filter out files if needed
+  const filteredContent = mappedContent.filter((e) => {
+    return (showHidden || !e.isHidden) && (showFiles || e.isDirectory);
+  });
+
+  // Add parent directory link if not root
+  if (!isRoot) {
+    filteredContent.unshift({
+      name: "..",
+      path: path.join(folderPath, ".."),
+      extension: "",
+      isDirectory: true,
+      isHidden: false,
+    });
   }
-  return response
+
+  // Generate HTML
+  const tableRows = filteredContent.map((e) => `<tr class="entryRow" onclick="window.location='${ e.name }';"><td>${ e.name }</td></tr>`).join('\n')
+
+  // Create a clickable table with the content of the folder
+  return `<table class="folderTable card">
+    <tr><th>Naam</th></tr>
+    ${tableRows}
+  </table>`;
 }
 
 //start the server listening on port 8001
@@ -225,50 +199,47 @@ server.listen(8001,function() {
 //zorg dat de server alle paths kan bereiken. 
 app.use(express.static(path.join(__dirname,'/')));
 
-app.use(function(req,res,next) {
-  if (req.originalUrl == '/') {
-    const folderPath = path.join(__dirname, req.originalUrl)
-    const response = printPage(`
-      <div class="card padding text-center">
-        Welkom bij de csdosc-startpagina!<br><br>
-        Voor meer informatie over het gebruik van deze library ga je naar <a href="https://csd.hku.nl/sysbas2122/" target="_blank">csd.hku.nl</a>
-      </div>
-      ${generateFileList(folderPath)}
-    `)
-    res.status(400).send(response);
-  }
-  else next()
-})
+/*---------------pages--------------/
+ *----------------------------------/
+ *///-------------------------------/
 
-//genereer errormessage als de pagina niet bestaat
 app.use(function(req,res,next) {
-  const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+  const fullUrl = req.protocol + "://" + req.get("host") + req.originalUrl;
   const filePath = path.join(__dirname, req.originalUrl)
-  if (!fs.existsSync(filePath)) {
-    res.status(400).send(printPage(`
-      <div class="card padding text-center">
-        <h2>Error!</h2><br>
-        De pagina <b>${fullUrl}</b> bestaat niet, heb je het goede adres ingevuld?
-      </div>`));
+  const exists = fs.existsSync(filePath)
+
+  let response = ''
+  let httpStatus = 200
+
+  // Generate error message if file does not exist
+  if (!exists) {
+    response = `<div class="card padding text-center">
+      <h2>Error!</h2><br>
+      De pagina <b>${fullUrl}</b> bestaat niet, heb je het goede adres ingevuld?
+    </div>`;
+    httpStatus = 404
   }
+  // Print a list of files in the requested folder
+  else {
+    const fileList = generateFileList(filePath, {
+      showHidden: false,
+      showFiles: false,
+    });
+
+    // Show a welcome message if folder is root
+    if (req.originalUrl === "/") {
+      response = `<div class="card padding text-center">
+        Welkom bij de csdosc-startpagina!<br><br>
+        Voor meer informatie over het gebruik van deze library ga je naar <a href="https://csd.hku.nl/" target="_blank">csd.hku.nl</a>
+      </div>${fileList}`;
+    } else {
+      response = `<div class="card padding">Inhoud van de folder: <b>${fullUrl}</b></div>${fileList}`;
+    }
+  }
+
+  if (response !== '') res.status(httpStatus).send(printPage(response));
   else next()
 })
-
-//print een lijst als de request een folder is
-app.use(function(req,res,next) {
-  const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-  const folderPath = path.join(__dirname, req.originalUrl)
-  const stats = fs.statSync(folderPath);
-
-  // Check if requested file is a directory
-  if (stats.isDirectory()) {
-    const folderPath = path.join(__dirname, req.originalUrl)
-    let response = printPage(`
-      <div class="card padding">Inhoud van de folder: <b>${fullUrl}</b></div>
-      ${generateFileList(folderPath)}`)
-    res.status(400).send(response);
-  } else next()
-});
 
 /*----------web-socket--------------/
  *----------------------------------/
