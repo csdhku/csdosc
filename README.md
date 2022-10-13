@@ -9,7 +9,8 @@ CSDOSC is een server gemaakt in Node.js die we gebruiken tijdens de lessen SYSBA
 * Ga in de terminal naar de map waarin je de csdosc-bestanden hebt gezet (bijvoorbeeld `cd ~/HKU/SYSBAS/csdosc`) en typ hier: 
 `npm install`  
 
-* Typ nu `node oscServer.js`.
+* Typ nu `npm start`.
+* Nu verschijnt er de volgende mededeling: `De server staat aan! Je kunt deze via localhost:8001 bereiken`. (verschijnt dit niet, kom dan in de les naar ons voor hulp)
 * Je kunt de webserver nu gebruiken!
 
 ## Installatie Windows (met gebruik van Ubuntu) ##
@@ -25,7 +26,8 @@ CSDOSC is een server gemaakt in Node.js die we gebruiken tijdens de lessen SYSBA
 * Voer daarvoor de volgende commando's in:  
 `npm install`  
 
-* Typ nu `node oscServer.js`
+* Typ nu `npm start`
+* Nu verschijnt er de volgende mededeling: `De server staat aan! Je kunt deze via localhost:8001 bereiken`. (verschijnt dit niet, kom dan in de les naar ons voor hulp)
 * Je kunt de webserver nu gebruiken!
 
 
