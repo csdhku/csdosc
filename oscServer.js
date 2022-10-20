@@ -89,6 +89,108 @@ function killOsc() {
  *----------------------------------/
  *///-------------------------------/
 
+/**
+ * Genereer een (mooie) pagina
+ * @param {String} body Content to be inserted into the page
+ * @returns {String} The HTML output
+ */
+function printPage (body) {
+ return `<html>
+    <head>
+      <title>Welkom bij de csdosc startpagina!</title>
+      <link rel="stylesheet" href="/Library/style.css" />
+    </head>
+    <body>${body}</body>
+  </html>`;
+}
+
+/**
+ * Genereer een lijst met de inhoud van de folder
+ * @param {String} folderPath path to be shown
+ * @param {Object} options options for the list generation
+ * @returns {String} The HTML output
+ */
+function generateFileList (folderPath, options = {}) {
+  const stats = fs.statSync(folderPath);
+  const ignorableNames = [
+    // Directories
+    /.git$/,
+    /^\/node_modules$/,
+    /^\/Library$/,
+    
+    // Files in root
+    /^\/.filesToUpdate.txt$/,
+    /^\/.lastUpdate.txt$/,
+    /^\/.updateState.txt$/,
+    /^\/LICENSE$/,
+    /^\/README.md$/,
+    /^\/favicon.ico$/,
+    /^\/oscServer.js$/,
+    /^\/oscLib.js$/,
+    /^\/package(-lock)?.json$/,
+    
+    // Files from all directories
+    /.DS_Store$/,
+    /.gitignore$/,
+  ];
+  
+  const showHidden = options.showHidden || false;
+  const showFiles = options.showFiles || false;
+
+  // Check if current folder is the root path (with fix for trailing '/')
+  const isRoot = path.join(folderPath, '/.') == path.join(__dirname, '/.')
+
+  // Return if the requested path is not a directory
+  if (!stats.isDirectory()) return ''
+
+  // Get folder content, filter out ignorable files using regex
+  const folderContent = fs.readdirSync(folderPath, { withFileTypes: true }).filter((e) => {
+    const filePath = path.join(folderPath, e.name).replace(__dirname, '')
+    for (const ignorableName of ignorableNames) {
+      if (ignorableName.test(filePath)) return false
+    }
+    return true
+  })
+  
+  // Map array to more useful data
+  const mappedContent = folderContent.map((e)=>{
+    const filePath = path.join(folderPath, e.name)
+    const fileStats = fs.statSync(filePath);
+    return {
+      name: e.name,
+      path: filePath,
+      extension: path.extname(filePath).replace('.', ''),
+      isDirectory: fileStats.isDirectory(),
+      isHidden: (/(^|\/)\.[^\/\.]/g).test(e.name)
+    }
+  });
+
+  // Filter out files if needed
+  const filteredContent = mappedContent.filter((e) => {
+    return (showHidden || !e.isHidden) && (showFiles || e.isDirectory);
+  });
+
+  // Add parent directory link if not root
+  if (!isRoot) {
+    filteredContent.unshift({
+      name: "..",
+      path: path.join(folderPath, ".."),
+      extension: "",
+      isDirectory: true,
+      isHidden: false,
+    });
+  }
+
+  // Generate HTML
+  const tableRows = filteredContent.map((e) => `<tr class="entryRow" onclick="window.location='${ e.name }';"><td>${ e.name }</td></tr>`).join('\n')
+
+  // Create a clickable table with the content of the folder
+  return `<table class="folderTable card">
+    <tr><th>Naam</th></tr>
+    ${tableRows}
+  </table>`;
+}
+
 //start the server listening on port 8001
 server.listen(8001,function() {
   console.log("De server staat aan! Je kunt deze via localhost:8001 bereiken.\nJe kunt dit programma afsluiten door stop+enter te typen");
@@ -97,11 +199,47 @@ server.listen(8001,function() {
 //zorg dat de server alle paths kan bereiken. 
 app.use(express.static(path.join(__dirname,'/')));
 
-//genereer errormessage als de pagina niet bestaat
+/*---------------pages--------------/
+ *----------------------------------/
+ *///-------------------------------/
+
 app.use(function(req,res,next) {
-  let fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-  res.status(400).send("De pagina <b>"+fullUrl+"</b> bestaat niet, heb je het goede adres ingevuld?");
-});
+  const fullUrl = req.protocol + "://" + req.get("host") + req.originalUrl;
+  const filePath = path.join(__dirname, req.originalUrl)
+  const exists = fs.existsSync(filePath)
+
+  let response = ''
+  let httpStatus = 200
+
+  // Generate error message if file does not exist
+  if (!exists) {
+    response = `<div class="card padding text-center">
+      <h2>Error!</h2><br>
+      De pagina <b>${fullUrl}</b> bestaat niet, heb je het goede adres ingevuld?
+    </div>`;
+    httpStatus = 404
+  }
+  // Print a list of files in the requested folder
+  else {
+    const fileList = generateFileList(filePath, {
+      showHidden: false,
+      showFiles: false,
+    });
+
+    // Show a welcome message if folder is root
+    if (req.originalUrl === "/") {
+      response = `<div class="card padding text-center">
+        Welkom bij de csdosc-startpagina!<br><br>
+        Voor meer informatie over het gebruik van deze library ga je naar <a href="https://csd.hku.nl/" target="_blank">csd.hku.nl</a>
+      </div>${fileList}`;
+    } else {
+      response = `<div class="card padding">Inhoud van de folder: <b>${fullUrl}</b></div>${fileList}`;
+    }
+  }
+
+  if (response !== '') res.status(httpStatus).send(printPage(response));
+  else next()
+})
 
 /*----------web-socket--------------/
  *----------------------------------/

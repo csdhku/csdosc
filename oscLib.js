@@ -137,7 +137,7 @@ function makeNote(note=60,velo=0.5,dur=100.0) {
   userStartAudio();
   if (getAudioContext().state != 'running') {
     console.warn("Audio is not loaded. Click on the screen to enable audio!\n", "Making note", int(note), "with vel", velo, "and duration", dur, "ms")
-  } else polySynth.play(midiToFreq(note), velo, 0.0, dur / 1000.);
+  } else polySynth.play(midiToFreq(note), velo, 0.0, dur / 1000.)
 }
 
 
