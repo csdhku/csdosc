@@ -213,10 +213,26 @@ function makeNoteSetup() {
 }
 
 function makeNote(note=60,velo=0.5,dur=100.0) {
+  let error = 0;
+  if (typeof note !== "number") {
+    console.error("note is not a number. it's a(n)",typeof note);
+    error = 1;
+  }
+  if (typeof velo !== "number") {
+    console.error("velocity is not a number. it's a(n)",typeof velo);
+    error = 1;
+  }
+  if (typeof dur !== "number") {
+    console.error("duration is not a number. it's a(n)",typeof dur);
+    error = 1;
+  }
   userStartAudio();
   if (getAudioContext().state != 'running') {
     console.warn("Audio is not loaded. Click on the screen to enable audio!\n", "Making note", int(note), "with vel", velo, "and duration", dur, "ms")
-  } else polySynth.play(midiToFreq(note), velo, 0.0, dur / 1000.);
+  } 
+  else if (error === 0) {
+    polySynth.play(midiToFreq(note), velo, 0.0, dur / 1000.);
+  }
 }
 
 
