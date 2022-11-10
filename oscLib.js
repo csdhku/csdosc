@@ -209,7 +209,7 @@ class Midi {
 }
 
 function makeNoteSetup() {
-  polySynth = new p5.PolySynth()
+  polySynth = new p5.PolySynth(p5.MonoSynth, 16);
 }
 
 function makeNote(note=60,velo=0.5,dur=100.0) {
