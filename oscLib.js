@@ -73,7 +73,7 @@ class Client {
     if (this.clientActive) {
       if (message === undefined || message.length === 0) {
         console.error("Je stuurt niets of stuurt iets dat undefined is");
-      if (Number.isNaN(message[0])) {
+      } else if (Number.isNaN(message[0])) {
         console.error("Je probeert iets te sturen wat niet bestaat, NaN");
       } else if (message === undefined || message.length === 0) {
         console.error(`je moet een waarde meegeven, alleen een adres is niet goed genoeg.`);
