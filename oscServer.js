@@ -9,9 +9,6 @@ const fs = require('fs');
 const http = require('http');
 const https = require('https');
 const _ = require('lodash');
-const midi = require('midi');
-const midiIn = new midi.Input();
-const midiOut = new midi.Output();
 
 let sendSocket = [];
 let oscServer = [];
@@ -112,12 +109,6 @@ app.use(function(req,res,next) {
 
 io.on('connection', function (socket) {
   clients[socket.id] = socket;  
-  if (midiIn) {
-    midiIn.closePort();
-  }
-  if (midiOut) {
-    midiOut.closePort();
-  }
   
   //initialize socket, make a connection with the webpage
   socket.on('oscLib',function(data) {
@@ -174,46 +165,6 @@ io.on('connection', function (socket) {
       });  
     }
   });
-
-  //midi:
-  //get midi-in-ports
-  socket.on('getInPorts',function(data) {
-    let sendData = [];
-    for (let i = 0; i < midiIn.getPortCount(); i++) {
-      sendData[i] = midiIn.getPortName(i);
-    }
-    sendSocket[data.id].emit("midiInPorts",sendData);
-  });
-
-  socket.on('getOutPorts',function(data) {
-    let sendData = [];
-    for (let i = 0; i < midiOut.getPortCount(); i++) {
-      sendData[i] = midiOut.getPortName(i);
-    }
-    sendSocket[data.id].emit("midiOutPorts",sendData);
-  })
-
-  //open port:
-  socket.on('openInPort',function(data) {
-    midiIn.openPort(data.port);
-    midiIn.on('message',(dTime,message) => {
-      let sendData = {"message":message};
-      sendSocket[data.id].emit("getMidi",sendData);
-    });
-  });
-
-  socket.on('openOutPort',function(data) {
-    midiOut.openPort(data.port);
-  });
-
-  socket.on('sendMidiData',function(data) {
-    if (data.chan >= 144 && data.chan < 192) {
-      midiOut.sendMessage([data.chan,data.note,data.vel]);
-    }
-    else {
-      midiOut.sendMessage([data.chan,data.note]);
-    }
-  })
 });
 
 

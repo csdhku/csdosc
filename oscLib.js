@@ -23,20 +23,6 @@ socket.on('connected',data => {
   connected = 1;
 });
 
-socket.on('midiInPorts',data => {
-  console.log("Available midi in ports:");
-  for (let i in data) {
-    console.log(i+":",data[i]);
-  }
-});
-
-socket.on('midiOutPorts',data => {
-  console.log("Available midi out ports:");
-  for (let i in data) {
-    console.log(i+":",data[i]);
-  }
-});
-
 
 /*
   Class voor het aanmaken van een OSC-client. De volgende functies zijn beschikbaar:
@@ -141,70 +127,6 @@ class Server {
       socket.emit('killServer');
       this.serverActive = 0;
     }
-  }
-}
-
-class Midi {
-  //methods for midi in.
-  getInPorts() {
-    socket.emit('getInPorts',{"id":socket.io.engine.id});
-  }
-  getOutPorts() {
-    socket.emit('getOutPorts',{"id":socket.io.engine.id});
-  }
-  getMidiNote(callback) {
-    this.getMidi(data => {
-      let chan = data[0];
-      if (chan >= 144 && chan < 160) {
-        let note = data[1];
-        let velocity = data[2];
-        callback(note,velocity,chan-143);  
-      }
-    });
-  }
-  getControlChange(callback) {
-    this.getMidi(data => {
-      let chan = data[0];
-      if (chan >= 176 && chan < 192) {
-        let ctl = data[1];
-        let val = data[2];
-        callback(ctl,val,chan-175);
-      }
-    })
-  }
-  getPgmChange(callback) {
-    this.getMidi(data => {
-      let chan = data[0];
-      if (chan >= 192 && chan < 208) {
-        let pgm = data[1];
-        callback(pgm,chan-191);
-      }
-    });
-  }
-  getMidi(callback) {
-    socket.on('getMidi',data => {
-      callback(data.message);
-    });
-  }
-
-  //methods for midi out
-  openInPort(p) {
-    socket.emit('openInPort',{"port":p,"id":socket.io.engine.id});
-  }
-  openOutPort(p) {
-    socket.emit('openOutPort',{"port":p});
-  }
-  sendMidiNote(note,vel,chan=1) {
-    let sendData = {"note":note,"vel":vel,"chan":chan+143,"id":socket.io.engine.id};
-    socket.emit('sendMidiData',sendData);
-  }
-  sendControlChange(note,vel,chan=1) {
-    let sendData = {"note":note,"vel":vel,"chan":chan+175,"id":socket.io.engine.id};
-    socket.emit('sendMidiData',sendData);
-  }
-  sendPgmChange(note,chan=1) {
-    let sendData = {"note":note,"chan":chan+192,"id":socket.io.engine.id};
-    socket.emit('sendMidiData',sendData);
   }
 }
 
