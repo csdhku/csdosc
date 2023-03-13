@@ -9,11 +9,16 @@ const fs = require('fs');
 const http = require('http');
 const https = require('https');
 const _ = require('lodash');
+const midi = require('midi');
+const midiIn = new midi.Input();
+const midiOut = new midi.Output();
+const {SerialPort} = require('serialport');
 
 let sendSocket = [];
 let oscServer = [];
 let oscClient = [];
 let clients = {};
+let serial;
 
 
 /*--------------osc-----------------/
@@ -119,6 +124,13 @@ io.on('connection', function (socket) {
 
     //what to do on disconnecting
     sendSocket[data].on('disconnect',function() {
+      if (serial) {
+        serial.close();
+      }
+      if (midiIn._events) {
+        midiIn.closePort();
+        midiOut.closePort();
+      }
       if (data && oscServer[data]) {
         oscServer[data].close();
         oscServer[data] = null;
@@ -165,6 +177,83 @@ io.on('connection', function (socket) {
       });  
     }
   });
+
+  //serial
+  //get serial ports
+  socket.on('getSerialPorts',function(data) {
+    let sendData = [];
+    SerialPort.list().then(ports => {
+      for (let i in ports) {
+        sendData[i] = {"path":ports[i].path,"manufacturer":ports[i].manufacturer,"serialNumber":ports[i].serialNumber};
+      }
+      sendSocket[data.id].emit("serialPorts",sendData);
+    });
+  });
+
+  //open Serial port by path (default)
+  socket.on('openSerialPort',function(data) {
+    serial = new SerialPort({
+      path: data.path,
+      baudRate: data.baudRate
+    }, function(err) {
+      serial.on('data', function(rcvdata) {
+        let sendData = {"message":rcvdata.toString()};
+        sendSocket[data.id].emit("serialData",sendData);
+      })
+    });
+  });
+
+  socket.on('sendSerialData',function(data) {
+    serial.write(data.message, err => {
+      if (err) {
+        console.log(`serial message ${data.message} cannot be sent.`)
+      }
+    });
+  });
+
+  //midi
+  //get midi-in-ports
+  socket.on('getInPorts',function(data) {
+    let sendData = [];
+    for (let i = 0; i < midiIn.getPortCount(); i++) {
+      sendData[i] = midiIn.getPortName(i);
+    }
+    sendSocket[data.id].emit("midiInPorts",sendData);
+  });
+
+  //get midi-out-ports
+  socket.on('getOutPorts',function(data) {
+    let sendData = [];
+    for (let i = 0; i < midiOut.getPortCount(); i++) {
+      sendData[i] = midiOut.getPortName(i);
+    }
+    sendSocket[data.id].emit("midiOutPorts",sendData);
+  });
+
+  //open port for incoming data
+  socket.on('openInPort',function(data) {
+    midiIn.openPort(data.port);
+    midiIn.on('message',(dTime,message) => {
+      let sendData = {"message":message};
+      sendSocket[data.id].emit("getMidi",sendData);
+    });
+  });
+
+  //open port for outgoing data
+  socket.on('openOutPort',function(data) {
+    midiOut.openPort(data.port);
+  });
+
+  //send midi data
+  socket.on('sendMidiData',function(data) {
+    if (data.chan >= 144 && data.chan < 192) {
+      midiOut.sendMessage([data.chan,data.note,data.vel]);
+    }
+    else {
+      midiOut.sendMessage([data.chan,data.note]);
+    }
+  });
+
 });
 
 
