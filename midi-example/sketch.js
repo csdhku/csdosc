@@ -13,6 +13,7 @@ function setup() {
   midi.getInPorts();
 
   //maak verbinding met specifieke poort
+  //Voer hier in welke poort je Teensy is (een getal uit de lijst die je ziet in de console als je deze sketch opstart)
   midi.openInPort(2);
   midi.openOutPort(2);
 
