@@ -127,8 +127,8 @@ io.on('connection', function (socket) {
       
       //close the open serial port, if available
       if (serial) {
-        if (serial.port) {
-          serial.close();
+        if (serial.isOpen) {       
+          serial.close()
         }
       }
       
