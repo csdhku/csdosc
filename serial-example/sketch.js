@@ -2,6 +2,8 @@ let serial;
 let pgmState = 0;
 
 //variabele om aan te geven welke poort je wilt gebruiken
+//op Mac is dit vaak iets als "/dev/tty.usbmodem..."
+//op Windows vaak "COM" met een cijfer erachter 
 let port = "COM3"
 function setup() {
   //plaats hier de code die maar één keer hoeft te worden uitgevoerd
@@ -23,8 +25,11 @@ function setup() {
   });
 
   //stuur seriële data
+  //stuur een berichtje "on" naar de teensy
   serial.sendSerialData("on");
   setTimeout(_ => {
+    //stuur na 2 seconden een bericht "of naar de Teensy"
+    //dit is alleen om te testen of je Seriële verbinding werkt
     serial.sendSerialData("off");
   },2000)
 }
@@ -40,12 +45,12 @@ function keyPressed() {
     if (pgmState === 0) {
       serial.closePort();
       pgmState = 1;
-      console.log("serial port is closed")
+      console.log("Serial port is closed: " + port)
     }
     else if (pgmState === 1) {
       serial.openPort(port,9600);
       pgmState = 0;
-      console.log("serial port is open");
+      console.log("Serial port is open: " + port);
     }
   }
 }
