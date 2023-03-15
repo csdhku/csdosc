@@ -170,6 +170,11 @@ class Serial {
     socket.emit('openSerialPort',sendData);
   }
 
+  closePort() {
+    const sendData = {"id":socket.io.engine.id}
+    socket.emit('closeSerialPort',sendData);
+  }
+
   getSerialData(callback) {
     socket.on('serialData',data => {
       callback(data.message);

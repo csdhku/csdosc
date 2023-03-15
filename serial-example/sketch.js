@@ -1,5 +1,5 @@
 let serial;
-
+let pgmState = 0;
 function setup() {
   //plaats hier de code die maar één keer hoeft te worden uitgevoerd
   createCanvas(800,600);
@@ -12,7 +12,7 @@ function setup() {
   serial.getPorts();
 
   //open de poort met het geslecteerde device
-  serial.openPort("/dev/tty.usbmodem58476101",9600);
+  serial.openPort("/dev/tty.usbmodem23211001",9600);
   
   //lees de seriële data en log naar de console
   serial.getSerialData(data => {
@@ -28,4 +28,21 @@ function setup() {
 
 function draw() {
   //plaats hier de code die continue herhaald moet worden.
+}
+
+function keyPressed() {
+  //als op je spatie drukt, wordt de poort gesloten of geopend
+  //zodat je makkelijk kan programmeren.
+  if (key === ' ') {
+    if (pgmState === 0) {
+      serial.closePort();
+      pgmState = 1;
+      console.log("serial port is closed")
+    }
+    else if (pgmState === 1) {
+      serial.openPort("/dev/tty.usbmodem23211001",9600);
+      pgmState = 0;
+      console.log("serial port is open");
+    }
+  }
 }

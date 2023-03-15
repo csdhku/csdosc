@@ -221,6 +221,14 @@ io.on('connection', function (socket) {
     });
   });
 
+  socket.on('closeSerialPort',function(data) {
+    if (serial) {
+      if (serial.isOpen) {
+        serial.close();
+      }
+    }
+  });
+
   //midi
   //get midi-in-ports
   socket.on('getInPorts',function(data) {
