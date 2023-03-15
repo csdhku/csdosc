@@ -124,13 +124,23 @@ io.on('connection', function (socket) {
 
     //what to do on disconnecting
     sendSocket[data].on('disconnect',function() {
+      
+      //close the open serial port, if available
       if (serial) {
-        serial.close();
+        if (serial.port) {
+          serial.close();
+        }
       }
+      
+      //close the midiPort, if available
       if (midiIn._events) {
         midiIn.closePort();
+      }
+      if (midiOut._events) {
         midiOut.closePort();
       }
+
+      //close the OSC-port. 
       if (data && oscServer[data]) {
         oscServer[data].close();
         oscServer[data] = null;
