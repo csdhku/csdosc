@@ -1,5 +1,8 @@
 let serial;
 let pgmState = 0;
+
+//variabele om aan te geven welke poort je wilt gebruiken
+let port = "COM3"
 function setup() {
   //plaats hier de code die maar één keer hoeft te worden uitgevoerd
   createCanvas(800,600);
@@ -12,7 +15,7 @@ function setup() {
   serial.getPorts();
 
   //open de poort met het geslecteerde device
-  serial.openPort("/dev/tty.usbmodem23211001",9600);
+  serial.openPort(port,9600);
   
   //lees de seriële data en log naar de console
   serial.getSerialData(data => {
@@ -40,7 +43,7 @@ function keyPressed() {
       console.log("serial port is closed")
     }
     else if (pgmState === 1) {
-      serial.openPort("/dev/tty.usbmodem23211001",9600);
+      serial.openPort(port,9600);
       pgmState = 0;
       console.log("serial port is open");
     }
