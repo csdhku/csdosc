@@ -340,6 +340,10 @@ async function startUpdate() {
     fs.readFile('./.filesToUpdate.txt','utf8',(err,data) => {
       if (err) {
         reject(`no files found to update`)
+      }        
+      let folder = list[i].split("/")[0]; //get the folder
+      if (!fs.existsSync(folder)) {
+        fs.mkdirSync(folder);
       }
       else {
         let updateList = data.split("\n")
