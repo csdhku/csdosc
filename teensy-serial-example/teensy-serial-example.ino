@@ -19,7 +19,7 @@ void loop() {
   //ontvang Serial op de Teensy
   if (Serial.available()) {
     //als er serial is, lees dat in de incomingByte variabele en stuur het terug over de Seriële verbinding
-    byte incomingByte = Serial.read();
-    Serial.println("got byte " + String(incomingByte));
+    String incomingByte = Serial.readString();
+    Serial.println("got byte " + incomingByte);
   }
 }

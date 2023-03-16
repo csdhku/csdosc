@@ -4,7 +4,7 @@ let pgmState = 0;
 //variabele om aan te geven welke poort je wilt gebruiken
 //op Mac is dit vaak iets als "/dev/tty.usbmodem..."
 //op Windows vaak "COM" met een cijfer erachter 
-let port = "COM3"
+let port = "/dev/tty.usbmodem23211001"
 function setup() {
   //plaats hier de code die maar één keer hoeft te worden uitgevoerd
   createCanvas(800,600);
@@ -52,5 +52,8 @@ function keyPressed() {
       pgmState = 0;
       console.log("Serial port is open: " + port);
     }
+  }
+  if (key === 'f') {
+    serial.sendSerialData('hallo!');
   }
 }
