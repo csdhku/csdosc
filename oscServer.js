@@ -340,12 +340,7 @@ async function startUpdate() {
     fs.readFile('./.filesToUpdate.txt','utf8',(err,data) => {
       if (err) {
         reject(`no files found to update`)
-      }        
-      let folder = list[i].split("/")[0]; //get the folder
-      if (!fs.existsSync(folder)) {
-        fs.mkdirSync(folder);
-      }
-      else {
+      } else {
         let updateList = data.split("\n")
         resolve(updateList);
       }
@@ -357,6 +352,11 @@ async function doUpdate(list) {
   return new Promise(async (resolve, reject) => {
     for (let i = 0; i < list.length; i++) {
       if (list[i] !== '') {
+        //check if this file is in a folder, if it does not exist yet, make it
+        let folder = list[i].split("/")[0]; //get the folder
+        if (!fs.existsSync(folder)) {
+          fs.mkdirSync(folder);
+        }
         await downloadFile('https://csd.hku.nl/sysbas/csdoscHelper/csdosc/'+list[i],list[i])
         .catch( error => {
           reject(error);
