@@ -1,13 +1,17 @@
+const fs = require('fs');
+const options = {
+  key:fs.readFileSync('./cert/localhost.key'),
+  cert:fs.readFileSync('./cert/localhost.crt')
+}
 const express = require('express');
 const app = express();
 const path = require('path');
-const server = require('http').Server(app);
-const io = require('socket.io')(server);
+const https = require('https');
+const server = https.createServer(options,app);
+const io = require('socket.io')(server, {rejectUnauthorized: false});
 const osc = require('node-osc');
 const readline = require('readline');
-const fs = require('fs');
-const http = require('http');
-const https = require('https');
+// const http = require('http');
 const _ = require('lodash');
 const midi = require('midi');
 const midiIn = new midi.Input();
@@ -95,7 +99,7 @@ function killOsc() {
  *///-------------------------------/
 
 //start the server listening on port 8001
-server.listen(8001,function() {
+server.listen(443,function() {
   console.log("De server staat aan! Je kunt deze via localhost:8001 bereiken.\nJe kunt dit programma afsluiten door stop+enter te typen");
 });
 
