@@ -23,32 +23,6 @@ socket.on('connected',data => {
   connected = 1;
 });
 
-//receive serial ports
-socket.on('serialPorts',data => {
-  console.log("Available serial ports");
-  for (let i in data) {
-    console.log(i+":",data[i]);
-  }
-})
-
-//receive midi-in-ports
-socket.on('midiInPorts',data => {
-  console.log("Available midi-in ports");
-  for (let i in data) {
-    console.log(i+":",data[i]);
-  }
-});
-
-//receive midi-out-ports
-socket.on('midiOutPorts',data => {
-  console.log("Available midi-out ports:");
-  for (let i in data) {
-    console.log(i+":",data[i]);
-  }
-});
-
-
-
 /*
   Class voor het aanmaken van een OSC-client. De volgende functies zijn beschikbaar:
  * - startClient(adres, poort) -> start een osc-client waarmee data verstuurd kan worden
@@ -107,7 +81,6 @@ class Client {
   }
 }
 
-
 /*
   Class voor het aanmaken van een OSC-server. De volgende functies zijn beschikbaar:
  * - startServer(poort) -> start een osc-server waarmee data ontvangen kan worden
@@ -152,138 +125,6 @@ class Server {
       socket.emit('killServer');
       this.serverActive = 0;
     }
-  }
-}
-
-class Serial {
-  getPorts() {
-    let sendData = {"id":socket.io.engine.id};
-    socket.emit('getSerialPorts',sendData);
-  }
-
-  openPort(path,baud) {
-    const sendData = {
-      "path":path,
-      "baudRate":baud,
-      "id":socket.io.engine.id
-    };
-    socket.emit('openSerialPort',sendData);
-  }
-
-  closePort() {
-    const sendData = {"id":socket.io.engine.id}
-    socket.emit('closeSerialPort',sendData);
-  }
-
-  getSerialData(callback) {
-    socket.on('serialData',data => {
-      callback(data.message);
-    });
-  }
-
-  sendSerialData(data) {
-    let sendData = {
-      "message":data,
-      "id":socket.io.engine.id
-    };
-    socket.emit('sendSerialData',sendData);
-  }
-}
-
-class Midi {
-  //methods for midi in:
-  getInPorts() {
-    let sendData = {"id":socket.io.engine.id};
-    socket.emit('getInPorts',sendData);
-  }
-
-  openInPort(p) {
-    let sendData = {
-      "port": p,
-      "id": socket.io.engine.id
-    }
-    socket.emit('openInPort',sendData);
-  }
-
-  getMidiNote(callback) {
-    this.getMidi(data => {
-      let chan = data[0];
-      if (chan >= 144 && chan < 160) {
-        let note = data[1];
-        let velocity = data[2];
-        callback(note,velocity,chan-143);
-      }
-    });
-  }
-
-  getControlChange(callback) {
-    this.getMidi(data => {
-      let chan = data[0];
-      if (chan >= 176 && chan < 192) {
-        let ctl = data[1];
-        let val = data[2];
-        callback(ctl,val,chan-175);
-      }
-    });
-  }
-
-  getPgmChange(callback) {
-    this.getMidi(data => {
-      let chan = data[0];
-      if (chan >= 192 && chan < 208) {
-        let pgm = data[1];
-        callback(pgm,chan-191);
-      }
-    });
-  }
-
-  getMidi(callback) {
-    socket.on('getMidi',data => {
-      callback(data.message);
-    });
-  }
-
-  //methods for midi out:
-  getOutPorts() {
-    let sendData = {"id":socket.io.engine.id};
-    socket.emit('getOutPorts',sendData);
-  }
-
-  openOutPort(p) {
-    let sendData = {
-      "port": p,
-      "id": socket.io.engine.id
-    };
-    socket.emit('openOutPort',sendData);
-  }
-
-  sendMidiNote(note,vel,chan=1) {
-    let sendData = {
-      "note": note,
-      "vel": vel,
-      "chan": chan+143,
-      "id": socket.io.engine.id
-    };
-    socket.emit('sendMidiData',sendData);
-  }
-
-  sendControlChange(ctl,val,chan=1) {
-    let sendData = {
-      "note": ctl,
-      "vel": val,
-      "chan": chan+175,
-      "id":socket.io.engine.id
-    };
-    socket.emit('sendMidiData',sendData);
-  }
-
-  sendPgmChange(note,chan=1) {
-    let sendData = {
-      "note": note,
-      "chan": chan+192,
-      "id": socket.io.engine.id
-    };
-    socket.emit('sendMidiData',sendData);
   }
 }
 
