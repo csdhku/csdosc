@@ -15,6 +15,7 @@ const fs = require('fs');
 const http = require('http');
 const https = require('https');
 const _ = require('lodash');
+const os = require('os');
 
 let sendSocket = [];
 let oscServer = [];
@@ -203,6 +204,16 @@ function generateFileList (folderPath, options = {}) {
 //start the server listening on port 8001
 server.listen(8001,function() {
   console.log("De server staat aan! Je kunt deze via localhost:8001 bereiken.\nJe kunt dit programma afsluiten door stop+enter te typen");
+  
+  if (os.release().includes('WSL2')) {
+    // Achterhaal het IP adres dat gebruikt kan worden om vanuit Windows OSC berichten naar deze WSL server te sturen.
+    let addresses = os.networkInterfaces()['eth0'];
+    for (let i = 0; i < addresses.length; i++) {
+      if (addresses[i].family === 'IPv4') {
+        console.log("De server kan OSC berichten ontvangen op " + addresses[i].address);
+      }
+    }
+  }
 });
 
 //zorg dat de server alle paths kan bereiken. 
@@ -293,7 +304,26 @@ io.on('connection', function (socket) {
   });
 
   //on receiving start message for client
-  socket.on('startClient',function(data) {
+  socket.on('startClient',function(data) {  
+    
+    // WSL2 en Windows kunnen helaas niet met elkaar communiceren via localhost of 127.0.0.1
+    // Daarom gaan we "localhost" of "127.0.0.1" met een werkend IP adres als de client vanuit WSL2 wordt gestart
+    if (os.release().includes('WSL2')) {
+      if (data.ip === '127.0.0.1' || data.ip === 'localhost') {
+        // Vanuit de terminal kan het IP van Windows (zoals gezien vanuit WSL2) worden gevonden in /etc/resolv.conf
+        // https://learn.microsoft.com/en-us/windows/wsl/networking#accessing-a-wsl-2-distribution-from-your-local-area-network-lan
+        const resolv = fs.readFileSync('/etc/resolv.conf', 'utf-8');
+
+        // We zoeken naar een line die start met nameserver, gevolgd door een spatie en daarna het IP adres
+        resolv.split(/\r?\n/).forEach(line =>  {
+          if (line.startsWith('nameserver')) {
+            // IP adres gevonden!
+            data.ip = line.split(' ')[1];
+          }
+        });
+      }
+    }
+
     oscClient[data.id] = new osc.Client(data.ip, data.port);
     sendSocket[data.id].emit("clientRunning",{"ip":data.ip,"port":data.port,"active":1});
   });
