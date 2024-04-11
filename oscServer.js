@@ -324,7 +324,7 @@ io.on('connection', function (socket) {
       }
     }
 
-    oscClient[data.id] = new osc.Client(data.ip, data.port);
+    oscClient[data.id+data.port] = new osc.Client(data.ip, data.port);
     sendSocket[data.id].emit("clientRunning",{"ip":data.ip,"port":data.port,"active":1});
   });
 
@@ -335,8 +335,8 @@ io.on('connection', function (socket) {
 
   //on receiving message to send
   socket.on('sendMessage',function(data) {
-    if (oscClient[data.id]) {
-      oscClient[data.id].send(data.address, data.message, function () {
+    if (oscClient[data.id+data.port]) {
+      oscClient[data.id+data.port].send(data.address, data.message, function () {
       });  
     }
   });

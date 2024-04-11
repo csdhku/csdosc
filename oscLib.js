@@ -33,10 +33,12 @@ class Client {
   constructor() {
     this.clientActive = 0;
     this.clientCounter = 0;
+    this.port;
   }
   startClient(address,port) {
     if (connected) {
       const sendData = {"ip":address,"port":port,"id":socket.io.engine.id};
+      this.port = port;
       socket.emit('startClient',sendData); 
       this.clientActive = 1; 
     }
@@ -68,7 +70,7 @@ class Client {
       else if (message < - 2147483648 || message > 2147483647) {
         console.error(`Getal is te klein of te groot\nHet getal mag niet kleiner zijn dan -2147483648 en groter dan 2147483647.\nhet getal dat je probeert te versturen is ${message}`);
       } else {
-        const sendData = {"address":address,"message":message,"id":socket.io.engine.id};
+        const sendData = {"address":address,"message":message,"id":socket.io.engine.id,"port":this.port};
         socket.emit('sendMessage',sendData);
       }
     }
