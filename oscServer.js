@@ -16,6 +16,7 @@ const http = require('http');
 const https = require('https');
 const _ = require('lodash');
 const os = require('os');
+const dns = require('node:dns');
 
 let sendSocket = [];
 let oscServer = [];
@@ -305,23 +306,20 @@ io.on('connection', function (socket) {
 
   //on receiving start message for client
   socket.on('startClient',function(data) {  
-    
-    // WSL2 en Windows kunnen helaas niet met elkaar communiceren via localhost of 127.0.0.1
-    // Daarom gaan we "localhost" of "127.0.0.1" met een werkend IP adres als de client vanuit WSL2 wordt gestart
-    if (os.release().includes('WSL2')) {
-      if (data.ip === '127.0.0.1' || data.ip === 'localhost') {
-        // Vanuit de terminal kan het IP van Windows (zoals gezien vanuit WSL2) worden gevonden in /etc/resolv.conf
-        // https://learn.microsoft.com/en-us/windows/wsl/networking#accessing-a-wsl-2-distribution-from-your-local-area-network-lan
-        const resolv = fs.readFileSync('/etc/resolv.conf', 'utf-8');
+    // In WSL1 Linux syscalls (such as networking) are translated to Windows syscalls. Using localhost should work to reach WSL and Windows programs.
+    // In WSL2 however Linux actually runs inside a Virtual Machine and therefore has a different localhost as the Windows localhost.
+    if (os.release().includes('WSL2') && data.ip === 'localhost-windows') {
+      // User is running from inside WSL2 and wants to send to an OSC server running in Windows (such as Max/MSP)
+      // Use the mDNS setup by Windows that resolves to the Windows localhost address
+      // Source for solution: https://stackoverflow.com/a/69407064
+      data.ip = os.hostname() + '.local';
 
-        // We zoeken naar een line die start met nameserver, gevolgd door een spatie en daarna het IP adres
-        resolv.split(/\r?\n/).forEach(line =>  {
-          if (line.startsWith('nameserver')) {
-            // IP adres gevonden!
-            data.ip = line.split(' ')[1];
-          }
-        });
-      }
+      // Let's check if this actually resolves to an IP
+      dns.lookup(data.ip, (err, address, family) => {
+        if (!(address)) {
+          console.log(err);
+        }
+      });
     }
 
     oscClient[data.id+data.port] = new osc.Client(data.ip, data.port);
