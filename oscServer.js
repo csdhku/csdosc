@@ -16,7 +16,6 @@ const http = require('http');
 const https = require('https');
 const _ = require('lodash');
 const os = require('os');
-const dns = require('node:dns');
 
 let sendSocket = [];
 let oscServer = [];
@@ -313,13 +312,6 @@ io.on('connection', function (socket) {
       // Use the mDNS setup by Windows that resolves to the Windows localhost address
       // Source for solution: https://stackoverflow.com/a/69407064
       data.ip = os.hostname() + '.local';
-
-      // Let's check if this actually resolves to an IP
-      dns.lookup(data.ip, (err, address, family) => {
-        if (!(address)) {
-          console.log(err);
-        }
-      });
     }
 
     oscClient[data.id+data.port] = new osc.Client(data.ip, data.port);
