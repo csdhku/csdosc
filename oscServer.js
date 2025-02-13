@@ -16,6 +16,7 @@ const http = require('http');
 const https = require('https');
 const _ = require('lodash');
 const os = require('os');
+const { execSync} = require('child_process');
 
 let sendSocket = [];
 let oscServer = [];
@@ -304,14 +305,24 @@ io.on('connection', function (socket) {
   });
 
   //on receiving start message for client
-  socket.on('startClient',function(data) {  
+  socket.on('startClient',function(data) {
+    
     // In WSL1 Linux syscalls (such as networking) are translated to Windows syscalls. Using localhost should work to reach WSL and Windows programs.
     // In WSL2 however Linux actually runs inside a Virtual Machine and therefore has a different localhost as the Windows localhost.
     if (os.release().includes('WSL2') && data.ip === 'localhost-windows') {
       // User is running from inside WSL2 and wants to send to an OSC server running in Windows (such as Max/MSP)
-      // Use the mDNS setup by Windows that resolves to the Windows localhost address
+      // Use the mDNS set up by Windows that resolves to the Windows localhost address
       // Source for solution: https://stackoverflow.com/a/69407064
-      data.ip = os.hostname() + '.local';
+      try {
+        // Using ping to find the IP behind hostname.local seemed to work for all users
+        const output = execSync('ping -c 1 $(hostname).local', { encoding: 'utf8' });
+        // Then use regex to match digits.digits.digits.digits to extract the IP.
+        data.ip = output.match(/(\d+\.\d+\.\d+\.\d+)/)[0];
+        console.log("IP van Windows localhost (" + data.ip + ") achterhaald d.m.v.: ping -c 1 $(hostname).local");
+      } catch (error) {
+        // Alternatively we can try this method although for some users that didn't work (see also  https://stackoverflow.com/a/69407064)
+        data.ip = os.hostname() + '.local';
+      }
     }
 
     oscClient[data.id+data.port] = new osc.Client(data.ip, data.port);
