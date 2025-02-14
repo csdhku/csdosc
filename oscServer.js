@@ -313,15 +313,27 @@ io.on('connection', function (socket) {
       // User is running from inside WSL2 and wants to send to an OSC server running in Windows (such as Max/MSP)
       // Use the mDNS set up by Windows that resolves to the Windows localhost address
       // Source for solution: https://stackoverflow.com/a/69407064
+      let ipFoundUsingPing = false;
       try {
         // Using ping to find the IP behind hostname.local seemed to work for all users
         const output = execSync('ping -c 1 $(hostname).local', { encoding: 'utf8' });
+
         // Then use regex to match digits.digits.digits.digits to extract the IP.
-        data.ip = output.match(/(\d+\.\d+\.\d+\.\d+)/)[0];
-        console.log("IP van Windows localhost (" + data.ip + ") achterhaald d.m.v.: ping -c 1 $(hostname).local");
+        let result = output.match(/(\d+\.\d+\.\d+\.\d+)/);
+        if (result) {
+          // Use first occurrence of IP as IP
+          data.ip = result[0];
+          ipFoundUsingPing = true;
+          console.log("IP van Windows localhost achterhaalt met ping: " + data.ip);
+        }
       } catch (error) {
+        // Oh no, execSync() failed :(
+      }
+
+      if (!ipFoundUsingPing) {
         // Alternatively we can try this method although for some users that didn't work (see also  https://stackoverflow.com/a/69407064)
         data.ip = os.hostname() + '.local';
+        console.log("IP van Windows localhost achterhalen met ping niet gelukt, maar wellicht werkt het alsnog!");
       }
     }
 
