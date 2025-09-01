@@ -127,6 +127,8 @@ function generateFileList (folderPath, options = {}) {
     /.git$/,
     /^\/node_modules$/,
     /^\/Library$/,
+    /^\\node_modules$/,
+    /^\\Library$/,
     
     // Files in root
     /^\/.filesToUpdate.txt$/,
