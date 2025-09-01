@@ -1,4 +1,4 @@
 @echo off
 CD %~dp0
-npm install
-npm start
+call npm install
+call npm start
