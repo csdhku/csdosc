@@ -28,7 +28,17 @@ function draw() {
 }
 
 function mouseMoved() {
-  //stuur een bericht naar het adres /x met als waarde de x-positie van de muis
+  sendMouse();
+}
+
+function touchMoved() {
+  // voor sommige telefoons is touchMoved belangrijk
+  // anders zie je geen data binnenkomen op de server
+  sendMouse();
+}
+
+function sendMouse() {
+    //stuur een bericht naar het adres /x met als waarde de x-positie van de muis
   client.sendMessage("/x",mouseX);
 
   //stuur een bericht naar het adres /y met als waarde de y-positie van de muis.
