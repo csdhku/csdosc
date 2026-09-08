@@ -266,7 +266,7 @@ app.use(express.static(path.join(__dirname,'/')));
  *///-------------------------------/
 
 io.on('connection', function (socket) {
-  clients[socket.id] = socket;  
+  clients[socket.client.id] = socket;  
   
   //initialize socket, make a connection with the webpage
   socket.on('oscLib',function(data) {
